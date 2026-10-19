@@ -24,15 +24,46 @@
     color: var(--text-dark);
     min-height: 100vh;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
     padding: 20px;
+  }
+
+  /* 顶部跳转按钮 */
+  .top-bar {
+    width: 100%;
+    max-width: 1050px;
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: flex-end;
+  }
+  .url-btn {
+    background: var(--glass-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    padding: 8px 20px;
+    color: var(--text-dark);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    box-shadow: var(--glass-shadow);
+    transition: 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .url-btn:hover {
+    background: #fff;
+    color: var(--primary);
+    transform: translateY(-2px);
   }
 
   .app-container {
     width: 100%;
     max-width: 1050px;
-    height: 85vh;
+    height: calc(100vh - 90px);
     min-height: 600px;
     display: flex;
     gap: 24px;
@@ -67,20 +98,34 @@
     gap: 20px;
   }
 
+  /* 升级版大唱片 */
   .disc {
     width: 200px;
     height: 200px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
+    background-color: #e0e7ff; /* 默认底色 */
+    background-size: cover;
+    background-position: center;
     display: grid;
     place-items: center;
-    box-shadow: 0 10px 30px rgba(99, 102, 241, 0.2), inset 0 0 0 10px rgba(255,255,255,0.5);
+    box-shadow: 0 10px 30px rgba(99, 102, 241, 0.2), inset 0 0 0 8px rgba(0,0,0,0.1);
     position: relative;
     transition: transform 0.3s;
   }
   .disc.playing { animation: spin 15s linear infinite; }
   @keyframes spin { 100% { transform: rotate(360deg); } }
-  .disc::after { content: '♪'; font-size: 40px; color: var(--primary); font-weight: bold; }
+  
+  /* 唱片的中心孔 */
+  .disc::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 30px; height: 30px;
+    background: rgba(255,255,255,0.85);
+    border-radius: 50%;
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.2);
+  }
 
   .song-info { text-align: center; width: 100%; padding: 0 10px; }
   .song-title { font-size: 20px; font-weight: 700; margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -168,12 +213,16 @@
   .track-item.dragging { opacity: 0.5; background: #fff; transform: scale(1.02); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
   .track-item.drag-over { border-top: 2px solid var(--primary); }
 
+  /* 列表项封面图 */
   .track-icon {
-    width: 40px; height: 40px; border-radius: 10px; flex-shrink: 0;
-    display: grid; place-items: center; font-size: 12px; font-weight: 700;
-    background: rgba(0,0,0,0.05); color: var(--text-light); transition: all 0.2s;
+    width: 46px; height: 46px; border-radius: 10px; flex-shrink: 0;
+    object-fit: cover; background: #e2e8f0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    transition: all 0.2s;
   }
-  .track-item.active .track-icon { background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: white; }
+  .track-item.active .track-icon {
+    box-shadow: 0 0 0 2px var(--primary); /* 激活时加个边框 */
+  }
 
   .track-info { flex: 1; min-width: 0; }
   .track-name { font-size: 15px; font-weight: 600; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 8px;}
@@ -227,23 +276,38 @@
   /* ================= 移动端适配 ================= */
   @media (max-width: 768px) {
     body { padding: 0; height: 100dvh; overflow: hidden; }
+    .top-bar {
+      position: absolute; top: 10px; right: 10px;
+      margin-bottom: 0; z-index: 100; width: auto;
+    }
+    .url-btn { padding: 6px 12px; font-size: 12px; background: rgba(255,255,255,0.8); }
+    
     .app-container { flex-direction: column; height: 100%; max-width: 100%; gap: 0; }
     .glass-panel { border-radius: 0; border: none; background: transparent; backdrop-filter: none; box-shadow: none; }
-    .player-panel { flex: 0 0 auto; padding: 20px 20px 10px; background: var(--glass-bg); backdrop-filter: blur(16px); border-bottom: 1px solid var(--glass-border); z-index: 10; }
-    .disc { width: 120px; height: 120px; font-size: 24px; box-shadow: 0 8px 20px rgba(99,102,241,0.2); }
-    .disc::after { font-size: 30px; }
+    
+    .player-panel { flex: 0 0 auto; padding: 40px 20px 10px; background: var(--glass-bg); backdrop-filter: blur(16px); border-bottom: 1px solid var(--glass-border); z-index: 10; }
+    .disc { width: 130px; height: 130px; }
+    .disc::after { width: 20px; height: 20px; }
+    
     .controls { margin-top: 15px; }
     .btn-play { width: 56px; height: 56px; font-size: 20px; }
     .progress-area { margin-top: 10px; }
+    
     .list-panel { flex: 1; background: rgba(255,255,255,0.4); padding: 15px 10px; }
     .header-top h2 { display: none; }
     .tag-input-wrap { margin-left: 0; width: 100%; }
     .tag-input { flex: 1; }
     .track-item { padding: 10px; margin-bottom: 4px; }
+    .track-icon { width: 40px; height: 40px; }
   }
 </style>
 </head>
 <body>
+
+<!-- 顶部跳转按钮 -->
+<div class="top-bar">
+  <a href="https://y2mate.gs/" target="_blank" class="url-btn">🔗 URL转换器</a>
+</div>
 
 <div class="app-container">
   <!-- 播放器面板 -->
@@ -280,11 +344,9 @@
         <h2>播放列表 <span id="songCount">(0)</span></h2>
       </div>
       <div class="tag-manager">
-        <!-- 筛选标签 -->
         <select class="tag-select" id="filterSelect">
           <option value="">🎵 全部歌曲</option>
         </select>
-        <!-- 新建标签 -->
         <div class="tag-input-wrap">
           <input type="text" class="tag-input" id="newTagInput" placeholder="输入新标签名...">
           <button class="btn-add-tag" id="addTagBtn">创建</button>
@@ -312,7 +374,7 @@
    1. 核心配置区
    ========================================================= */
 const CONFIG = {
-  owner: 'FanyDay102',
+  owner: 'yzcorpsdk2-ctrl',
   repo: 'soundsudio',
   branch: 'main'
 };
@@ -320,17 +382,17 @@ const CONFIG = {
 /* =========================================================
    2. 状态与 DOM
    ========================================================= */
-let allSongs = [];        // 从仓库获取的所有歌曲数据
-let displaySongs = [];    // 当前筛选后展示的歌曲
-let currentIndex = -1;    // 当前播放的歌曲在 displaySongs 中的索引
+let allSongs = [];        
+let displaySongs = [];    
+let currentIndex = -1;    
 let isPlaying = false;
-let repeatMode = 'all';   // 'all', 'one', 'off'
+let repeatMode = 'all';   
 let isShuffle = false;
 
 // 标签数据持久化
-let globalTags = JSON.parse(localStorage.getItem('mp_tags_pool') || '[]'); // 所有可用标签
-let songTagsMap = JSON.parse(localStorage.getItem('mp_song_tags') || '{}'); // 歌曲对应标签列表
-let savedOrder = JSON.parse(localStorage.getItem('mp_song_order') || '[]'); // 用户自定义排序
+let globalTags = JSON.parse(localStorage.getItem('mp_tags_pool') || '[]'); 
+let songTagsMap = JSON.parse(localStorage.getItem('mp_song_tags') || '{}'); 
+let savedOrder = JSON.parse(localStorage.getItem('mp_song_order') || '[]'); 
 
 const audio = document.getElementById('audio');
 const disc = document.getElementById('disc');
@@ -353,10 +415,18 @@ const contextMenu = document.getElementById('contextMenu');
 const downloadBtn = document.getElementById('downloadBtn');
 const menuTags = document.getElementById('menuTags');
 
-let activeMenuPath = ''; // 当前正在操作设置菜单的歌曲 path
+let activeMenuPath = ''; 
 
 /* =========================================================
-   3. 获取并处理 GitHub 文件
+   3. 核心小工具：生成固定随机封面
+   ========================================================= */
+// 使用歌曲路径作为种子，确保每首歌每次刷新拿到的图片是一致的
+function getCoverUrl(seed) {
+  return `https://picsum.photos/seed/${encodeURIComponent(seed)}/300/300`;
+}
+
+/* =========================================================
+   4. 获取并处理 GitHub 文件
    ========================================================= */
 async function fetchSongs() {
   const url = `https://api.github.com/repos/${CONFIG.owner}/${CONFIG.repo}/git/trees/${CONFIG.branch}?recursive=1`;
@@ -383,14 +453,13 @@ async function fetchSongs() {
       };
     });
 
-    // 应用用户的自定义排序
     applySavedOrder();
-    
-    // 初始化 UI
     updateTagSelect();
     renderPlaylist();
+    
     songTitle.textContent = '准备就绪';
     songArtist.textContent = '点击列表开始播放';
+    
   } catch (error) {
     console.error(error);
     playlistEl.innerHTML = `<li class="status-msg" style="color:#ef4444">❌ ${error.message}</li>`;
@@ -411,9 +480,8 @@ function applySavedOrder() {
 }
 
 /* =========================================================
-   4. 标签与筛选逻辑
+   5. 标签与筛选逻辑
    ========================================================= */
-// 更新下拉筛选框的标签选项
 function updateTagSelect() {
   const currentVal = filterSelect.value;
   filterSelect.innerHTML = '<option value="">🎵 全部歌曲</option>' + 
@@ -421,12 +489,10 @@ function updateTagSelect() {
   if (globalTags.includes(currentVal)) filterSelect.value = currentVal;
 }
 
-// 监听筛选变化
 filterSelect.addEventListener('change', () => {
   renderPlaylist();
 });
 
-// 创建新标签
 addTagBtn.addEventListener('click', () => {
   const val = newTagInput.value.trim();
   if (!val) return;
@@ -441,12 +507,11 @@ addTagBtn.addEventListener('click', () => {
 });
 
 /* =========================================================
-   5. 渲染列表 (包含拖拽与标签展示)
+   6. 渲染列表
    ========================================================= */
 function renderPlaylist() {
   const filterTag = filterSelect.value;
 
-  // 筛选数据
   displaySongs = allSongs.filter(song => {
     if (!filterTag) return true;
     const tags = songTagsMap[song.path] || [];
@@ -464,10 +529,12 @@ function renderPlaylist() {
     const isActive = index === currentIndex ? 'active' : '';
     const tags = songTagsMap[song.path] || [];
     const tagHtml = tags.map(t => `<span class="mini-tag">${t}</span>`).join('');
+    const cover = getCoverUrl(song.path);
 
     return `
       <li class="track-item ${isActive}" draggable="true" data-index="${index}" data-path="${song.path}">
-        <div class="track-icon">MP3</div>
+        <!-- 封面图片替换了原来的文字标签 -->
+        <img class="track-icon" src="${cover}" loading="lazy" alt="cover">
         <div class="track-info">
           <div class="track-name">${song.name}</div>
           <div class="track-path">${song.path}</div>
@@ -479,7 +546,6 @@ function renderPlaylist() {
     `;
   }).join('');
 
-  // 恢复当前播放项的高亮与滚动
   if (currentIndex >= 0 && currentIndex < displaySongs.length) {
     const activeItem = playlistEl.querySelector('.track-item.active');
     if (activeItem) activeItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -487,16 +553,13 @@ function renderPlaylist() {
 }
 
 /* =========================================================
-   6. 歌曲设置菜单 (下载 / 打标签)
+   7. 歌曲设置菜单 (下载 / 打标签)
    ========================================================= */
 window.openMenu = function(e, path) {
-  e.stopPropagation(); // 阻止冒泡（不要触发播放）
+  e.stopPropagation(); 
   activeMenuPath = path;
-
-  // 获取当前歌曲的标签
   const currentTags = songTagsMap[path] || [];
 
-  // 渲染菜单里的标签复选框
   if (globalTags.length === 0) {
     menuTags.innerHTML = '<div style="padding:10px; font-size:12px; color:#999;">暂无标签，请先在上方创建</div>';
   } else {
@@ -509,17 +572,14 @@ window.openMenu = function(e, path) {
     `).join('');
   }
 
-  // 定位菜单
   const rect = e.target.getBoundingClientRect();
   contextMenu.style.display = 'block';
   
-  // 防止菜单超出屏幕下方
   let top = rect.bottom + 5;
   if (top + contextMenu.offsetHeight > window.innerHeight) {
     top = rect.top - contextMenu.offsetHeight - 5;
   }
   
-  // 防止菜单超出屏幕右侧
   let left = rect.left - 100;
   if (left + contextMenu.offsetWidth > window.innerWidth) {
     left = window.innerWidth - contextMenu.offsetWidth - 10;
@@ -529,30 +589,24 @@ window.openMenu = function(e, path) {
   contextMenu.style.left = left + 'px';
 }
 
-// 点击空白处关闭菜单
 document.addEventListener('click', () => {
   contextMenu.style.display = 'none';
 });
 
-// 切换歌曲标签
 window.toggleSongTag = function(path, tag, isChecked) {
   if (!songTagsMap[path]) songTagsMap[path] = [];
-  
   if (isChecked) {
     if (!songTagsMap[path].includes(tag)) songTagsMap[path].push(tag);
   } else {
     songTagsMap[path] = songTagsMap[path].filter(t => t !== tag);
   }
-  
   localStorage.setItem('mp_song_tags', JSON.stringify(songTagsMap));
-  renderPlaylist(); // 刷新列表让标签显示出来
+  renderPlaylist();
 }
 
-// 下载歌曲
 downloadBtn.addEventListener('click', () => {
   const song = allSongs.find(s => s.path === activeMenuPath);
   if (song) {
-    // 创建一个隐藏的 a 标签触发下载
     const a = document.createElement('a');
     a.href = song.url;
     a.download = song.name + '.mp3';
@@ -563,7 +617,7 @@ downloadBtn.addEventListener('click', () => {
 });
 
 /* =========================================================
-   7. 拖拽排序逻辑
+   8. 拖拽排序
    ========================================================= */
 let draggedItem = null;
 
@@ -585,11 +639,8 @@ playlistEl.addEventListener('dragover', (e) => {
   e.preventDefault();
   const target = e.target.closest('.track-item');
   if (!target || target === draggedItem) return;
-  
-  // 这里只允许在当前显示的列表内交换位置，以防错乱
   const rect = target.getBoundingClientRect();
   const offset = e.clientY - rect.top;
-  
   if (offset > rect.height / 2) {
     target.parentNode.insertBefore(draggedItem, target.nextSibling);
   } else {
@@ -598,46 +649,24 @@ playlistEl.addEventListener('dragover', (e) => {
 });
 
 function saveNewOrder() {
-  // 从 DOM 中读取新的顺序
   const newPaths = Array.from(playlistEl.querySelectorAll('.track-item')).map(li => li.dataset.path);
-  
-  // 按照新的路径顺序重排 allSongs (只重排当前显示出来的，或者把它整合进全量)
-  // 这里的逻辑比较复杂：如果我们正在筛选标签，拖拽了部分歌曲，我们如何保存全局顺序？
-  // 最简单的做法：保持未显示的歌的位置不动，把显示的歌按新顺序插回原位置。
-  // 为了简单且不破坏用户心智，直接把整个全量列表的路径保存下来，前提是能把所有 DOM 顺序抓下来。
-  // 如果当前有筛选，那 DOM 里只有一部分，我们只能保存这一部分，但为了绝对安全，我们直接提取页面上可见的。
-  
-  // 更优解：点击时立刻保存当前的显示顺序，如果是筛选状态，则部分更新。
-  // 为了让用户切回“全部”时顺序也正确，我们这里直接基于当前可见的 DOM 顺序，重组 `allSongs`。
-  // 但当前可见的 DOM 顺序不包含隐藏的歌。
-  
-  // 实现方案：对于可见的歌曲，记录它们的新顺序。把隐藏的歌曲直接追加到后面。
-  // 因为用户当前就在看这些标签的歌，所以它们排前面用户也能接受。
-  // 如果想完美，需要使用更复杂的映射，但这里可以简单处理：
-  
-  const currentOrderPaths = newPaths;
-  
-  // 把 allSongs 根据新路径重排
   allSongs.sort((a, b) => {
-    const iA = currentOrderPaths.indexOf(a.path);
-    const iB = currentOrderPaths.indexOf(b.path);
+    const iA = newPaths.indexOf(a.path);
+    const iB = newPaths.indexOf(b.path);
     if (iA !== -1 && iB !== -1) return iA - iB;
     if (iA !== -1) return -1;
     if (iB !== -1) return 1;
     return 0;
   });
-
-  // 保存到本地
   localStorage.setItem('mp_song_order', JSON.stringify(allSongs.map(s => s.path)));
 }
 
 /* =========================================================
-   8. 播放核心逻辑
+   9. 播放核心逻辑
    ========================================================= */
 function loadSong(index, autoPlay = true) {
   if (index < 0 || index >= displaySongs.length) return;
   
-  // 如果同一首歌，切换播放/暂停
   if (currentIndex === index && audio.src === displaySongs[index].url) {
     if (isPlaying) audio.pause();
     else audio.play();
@@ -651,19 +680,21 @@ function loadSong(index, autoPlay = true) {
   songArtist.textContent = song.path;
   document.title = `${song.name} - 音乐播放器`;
 
-  // 更新 UI
+  // 更新左侧大唱片背景为当前歌曲封面
+  disc.style.backgroundImage = `url('${getCoverUrl(song.path)}')`;
+
   document.querySelectorAll('.track-item').forEach(el => el.classList.remove('active'));
   const activeItem = playlistEl.querySelector(`.track-item[data-index="${index}"]`);
   if (activeItem) activeItem.classList.add('active');
 
   audio.src = song.url;
   
-  // 后台控制 (Media Session)
+  // 后台控制
   if ('mediaSession' in navigator) {
     navigator.mediaSession.metadata = new MediaMetadata({
       title: song.name,
       artist: 'GitHub 音乐',
-      album: '我的收藏'
+      artwork: [{ src: getCoverUrl(song.path), sizes: '300x300', type: 'image/jpeg' }]
     });
     navigator.mediaSession.setActionHandler('play', () => audio.play());
     navigator.mediaSession.setActionHandler('pause', () => audio.pause());
@@ -696,12 +727,10 @@ function updatePlayBtnUI() {
   else disc.classList.remove('playing');
 }
 
-// 下一首索引计算
 function getNextIndex() {
   if (displaySongs.length === 0) return -1;
   if (displaySongs.length === 1) return 0;
   if (isShuffle) return getRandomIndex();
-
   if (currentIndex === displaySongs.length - 1) {
     if (repeatMode === 'off') return -1;
     return 0;
@@ -718,7 +747,6 @@ function getRandomIndex() {
 
 function handleNextPrev(direction) {
   if (displaySongs.length === 0) return;
-  
   if (direction === 'next') {
     const nextIdx = getNextIndex();
     if (nextIdx === -1) {
@@ -742,46 +770,35 @@ function handleNextPrev(direction) {
 }
 
 /* =========================================================
-   9. 事件监听
+   10. 事件监听
    ========================================================= */
-// 列表点击播放
 playlistEl.addEventListener('click', (e) => {
-  if (e.target.closest('.btn-more')) return; // 点设置菜单不要触发播放
+  if (e.target.closest('.btn-more')) return;
   const li = e.target.closest('.track-item');
   if (!li) return;
   const index = parseInt(li.dataset.index);
   loadSong(index);
 });
 
-// 播放控制
 playBtn.addEventListener('click', () => { isPlaying ? pauseAudio() : playAudio(); });
 prevBtn.addEventListener('click', () => handleNextPrev('prev'));
 nextBtn.addEventListener('click', () => handleNextPrev('next'));
 
-// 循环模式
 modeBtn.addEventListener('click', () => {
   if (repeatMode === 'all') {
-    repeatMode = 'one';
-    modeBtn.textContent = '🔂';
-    modeBtn.classList.add('active');
+    repeatMode = 'one'; modeBtn.textContent = '🔂'; modeBtn.classList.add('active');
   } else if (repeatMode === 'one') {
-    repeatMode = 'off';
-    modeBtn.textContent = '➡️';
-    modeBtn.classList.remove('active');
+    repeatMode = 'off'; modeBtn.textContent = '➡️'; modeBtn.classList.remove('active');
   } else {
-    repeatMode = 'all';
-    modeBtn.textContent = '🔁';
-    modeBtn.classList.add('active');
+    repeatMode = 'all'; modeBtn.textContent = '🔁'; modeBtn.classList.add('active');
   }
 });
 
-// 随机模式
 shuffleBtn.addEventListener('click', () => {
   isShuffle = !isShuffle;
   shuffleBtn.classList.toggle('active', isShuffle);
 });
 
-// 音频事件
 audio.addEventListener('play', () => { isPlaying = true; updatePlayBtnUI(); });
 audio.addEventListener('pause', () => { isPlaying = false; updatePlayBtnUI(); });
 audio.addEventListener('ended', () => {
@@ -827,9 +844,6 @@ function fmtTime(sec) {
   return m + ':' + String(s).padStart(2, '0');
 }
 
-/* =========================================================
-   10. 启动
-   ========================================================= */
 updateTagSelect();
 fetchSongs();
 </script>
