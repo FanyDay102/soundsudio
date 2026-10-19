@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YouTube 歌曲下载器</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      background: #0f0f1a;
+      color: #e8e8f0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .card {
+      width: 100%;
+      max-width: 560px;
+      background: #1a1a2e;
+      border-radius: 16px;
+      padding: 32px 28px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+      border: 1px solid #2a2a45;
+    }
+    h1 {
+      font-size: 1.5rem;
+      text-align: center;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+    .subtitle {
+      text-align: center;
+      color: #8888aa;
+      font-size: 0.85rem;
+      margin-bottom: 24px;
+    }
+    .input-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    #url {
+      flex: 1;
+      padding: 14px 16px;
+      border-radius: 10px;
+      border: 1px solid #2a2a45;
+      background: #0f0f1a;
+      color: #e8e8f0;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border 0.2s;
+    }
+    #url:focus { border-color: #6c5ce7; }
+    #url::placeholder { color: #555577; }
+    select {
+      padding: 14px 12px;
+      border-radius: 10px;
+      border: 1px solid #2a2a45;
+      background: #0f0f1a;
+      color: #e8e8f0;
+      font-size: 0.9rem;
+      outline: none;
+      cursor: pointer;
+    }
+    #convertBtn {
+      width: 100%;
+      padding: 16px;
+      border-radius: 10px;
+      border: none;
+      background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+    }
+    #convertBtn:hover:not(:disabled) { opacity: 0.9; }
+    #convertBtn:active:not(:disabled) { transform: scale(0.98); }
+    #convertBtn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+    .status {
+      margin-top: 20px;
+      min-height: 24px;
+      font-size: 0.85rem;
+      text-align: center;
+      color: #8888aa;
+      transition: color 0.2s;
+    }
+    .status.error { color: #ff6b6b; }
+    .status.success { color: #51cf66; }
+    #downloadArea {
+      margin-top: 16px;
+      display: none;
+    }
+    #downloadBtn {
+      display: block;
+      width: 100%;
+      padding: 14px;
+      border-radius: 10px;
+      border: 1px solid #51cf66;
+      background: transparent;
+      color: #51cf66;
+      font-size: 0.95rem;
+      font-weight: 600;
+      text-align: center;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+    #downloadBtn:hover {
+      background: #51cf66;
+      color: #0f0f1a;
+    }
+    .legal {
+      margin-top: 20px;
+      font-size: 0.7rem;
+      color: #555577;
+      text-align: center;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>🎵 YouTube 歌曲下载器</h1>
+    <p class="subtitle">粘贴链接，选择码率，一键下载 MP3</p>
+
+    <div class="input-group">
+      <input
+        id="url"
+        type="url"
+        placeholder="https://www.youtube.com/watch?v=..."
+        autocomplete="off"
+      >
+      <select id="quality">
+        <option value="128">128kbps</option>
+        <option value="192" selected>192kbps</option>
+        <option value="320">320kbps</option>
+      </select>
+    </div>
+
+    <button id="convertBtn">转换并下载</button>
+
+    <div id="status" class="status"></div>
+
+    <div id="downloadArea">
+      <a id="downloadBtn" href="#" download>⬇ 保存 MP3 文件</a>
+    </div>
+
+    <p class="legal">
+      仅限下载您拥有版权或已获授权的内容。请遵守 YouTube 服务条款。
+    </p>
+  </div>
+
+  <script>
+    const urlInput = document.getElementById('url');
+    const qualitySelect = document.getElementById('quality');
+    const convertBtn = document.getElementById('convertBtn');
+    const statusEl = document.getElementById('status');
+    const downloadArea = document.getElementById('downloadArea');
+    const downloadBtn = document.getElementById('downloadBtn');
+
+    // ⚠️ 替换为你自己的后端地址
+    const API_BASE = 'http://localhost:8000';
+
+    function setStatus(msg, type = '') {
+      statusEl.textContent = msg;
+      statusEl.className = 'status' + (type ? ' ' + type : '');
+    }
+
+    function isValidYouTubeUrl(str) {
+      try {
+        const u = new URL(str.trim());
+        return (
+          u.hostname === 'www.youtube.com' ||
+          u.hostname === 'youtube.com' ||
+          u.hostname === 'youtu.be' ||
+          u.hostname === 'm.youtube.com'
+        );
+      } catch {
+        return false;
+      }
+    }
+
+    convertBtn.addEventListener('click', async () => {
+      const rawUrl = urlInput.value.trim();
+      const bitrate = qualitySelect.value;
+
+      if (!rawUrl) {
+        setStatus('请先粘贴 YouTube 链接', 'error');
+        return;
+      }
+      if (!isValidYouTubeUrl(rawUrl)) {
+        setStatus('请输入有效的 YouTube 链接', 'error');
+        return;
+      }
+
+      // 重置状态
+      convertBtn.disabled = true;
+      downloadArea.style.display = 'none';
+      setStatus('正在连接服务器…');
+
+      try {
+        // 第一步：发起转换任务
+        const res = await fetch(`${API_BASE}/api/convert`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: rawUrl, bitrate: parseInt(bitrate, 10) }),
+        });
+
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.detail || `服务器返回 ${res.status}`);
+        }
+
+        const data = await res.json();
+
+        // 情况 A：同步返回，直接拿到下载地址
+        if (data.download_url) {
+          showDownload(data.download_url, data.filename);
+          return;
+        }
+
+        // 情况 B：异步任务，轮询进度
+        if (data.job_id) {
+          await pollJob(data.job_id);
+          return;
+        }
+
+        throw new Error('服务器响应格式异常');
+      } catch (e) {
+        setStatus(e.message || '转换失败，请稍后重试', 'error');
+        convertBtn.disabled = false;
+      }
+    });
+
+    function showDownload(url, filename) {
+      downloadBtn.href = url;
+      if (filename) downloadBtn.setAttribute('download', filename);
+      downloadArea.style.display = 'block';
+      setStatus('转换完成，点击下方按钮保存', 'success');
+      convertBtn.disabled = false;
+    }
+
+    async function pollJob(jobId) {
+      const maxAttempts = 120; // 最多轮询 120 次（约 4 分钟）
+      let attempts = 0;
+
+      const tick = async () => {
+        attempts++;
+        if (attempts > maxAttempts) {
+          throw new Error('处理超时，请稍后重试');
+        }
+
+        const res = await fetch(`${API_BASE}/api/job/${jobId}`);
+        if (!res.ok) throw new Error('查询任务状态失败');
+
+        const job = await res.json();
+
+        if (job.status === 'done' && job.download_url) {
+          showDownload(job.download_url, job.filename);
+          return;
+        }
+        if (job.status === 'failed') {
+          throw new Error(job.error || '转换失败');
+        }
+
+        const progress = job.progress ? ` (${job.progress}%)` : '';
+        setStatus(`正在处理…${progress}`);
+        setTimeout(tick, 2000);
+      };
+
+      await tick();
+    }
+  </script>
+</body>
+</html>
