@@ -773,8 +773,18 @@
    ========================================================= */
 const CONFIG = { owner: 'FanyDay102', repo: 'soundsudio', branch: 'main' };
 
-/* ⚠️ GitHub 个人访问令牌（需 repo 写权限） */
-const GH_TOKEN = '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';
+/* ★ 核心修改：彻底移除硬编码 Token，改为从 sessionStorage 获取或用户弹窗输入 */
+function getGitHubToken() {
+  let token = sessionStorage.getItem('gh_token');
+  if (!token) {
+    token = prompt("⚠️ 为了安全执行上传或删除操作，请输入你的 GitHub PAT (以 github_pat_ 开头)：\n\n(注意：Token 仅临时保存在当前浏览器中，关闭网页即失效)");
+    if (token) {
+      token = token.trim();
+      sessionStorage.setItem('gh_token', token);
+    }
+  }
+  return token;
+}
 
 let allSongs = [];
 let displaySongs = [];
@@ -842,30 +852,40 @@ function escapeHtml(s) {
 }
 
 /* =========================================================
-   GitHub API 封装
+   GitHub API 封装 (使用动态 Token)
    ========================================================= */
 function encodePath(p) {
   return p.split('/').map(encodeURIComponent).join('/');
 }
 
 async function ghApi(endpoint, options = {}) {
+  const token = getGitHubToken();
+  if (!token) throw new Error('未提供 GitHub Token，操作取消');
+
   const res = await fetch(`https://api.github.com/repos/${CONFIG.owner}/${CONFIG.repo}/${endpoint}`, {
     ...options,
     headers: {
-      'Authorization': `Bearer ${GH_TOKEN}`,
+      'Authorization': `Bearer ${token}`,
       'Accept': 'application/vnd.github+json',
       'X-GitHub-Api-Version': '2022-11-28',
       ...(options.headers || {})
     }
   });
+  
   if (!res.ok) {
     let msg = `${res.status} ${res.statusText}`;
     try {
       const j = await res.json();
       if (j && j.message) msg = j.message;
     } catch (e) { /* ignore */ }
+    
+    // 如果是 401 权限错误，清除失效的 Token
+    if (res.status === 401) {
+      sessionStorage.removeItem('gh_token');
+    }
     throw new Error(msg);
   }
+  
   if (res.status === 204) return null;
   return res.json();
 }
@@ -1717,6 +1737,12 @@ function renderPendingFiles() {
 document.getElementById('doUploadBtn').addEventListener('click', async () => {
   if (pendingFiles.length === 0) return;
 
+  // 如果没有 Token，或者 Token 失效了，弹窗让用户输入
+  if (!getGitHubToken()) {
+    alert('必须提供 Token 才能上传！');
+    return;
+  }
+
   const dir = document.getElementById('uploadDir').value.trim();
   const btn = document.getElementById('doUploadBtn');
   const log = document.getElementById('uploadLog');
@@ -1739,6 +1765,11 @@ document.getElementById('doUploadBtn').addEventListener('click', async () => {
     } catch (err) {
       fail++;
       logLine(log, `✘ 失败：${file.name}（${err.message}）`, 'err');
+      if (err.message.includes('401') || err.message.includes('Bad credentials')) {
+        logLine(log, `⚠️ Token 无效或已过期，请重新点击上传并输入新 Token`, 'err');
+        btn.disabled = false;
+        return;
+      }
     }
   }
 
@@ -1773,6 +1804,11 @@ document.getElementById('doDeleteBtn').addEventListener('click', async () => {
 
   if (!confirm(`确定删除选中的 ${paths.length} 首歌曲吗？\n\n⚠️ 这会同时删除 GitHub 仓库中的音频文件，不可恢复！`)) return;
 
+  if (!getGitHubToken()) {
+    alert('必须提供 Token 才能删除！');
+    return;
+  }
+
   const btn = document.getElementById('doDeleteBtn');
   const log = document.getElementById('deleteLog');
   btn.disabled = true;
@@ -1796,6 +1832,11 @@ document.getElementById('doDeleteBtn').addEventListener('click', async () => {
     } catch (err) {
       fail++;
       logLine(log, `✘ 失败：${path}（${err.message}）`, 'err');
+      if (err.message.includes('401') || err.message.includes('Bad credentials')) {
+        logLine(log, `⚠️ Token 无效或已过期，请重新点击删除并输入新 Token`, 'err');
+        btn.disabled = false;
+        return;
+      }
     }
   }
 
@@ -1859,7 +1900,6 @@ async function downloadSongFile(song) {
     a.remove();
     setTimeout(() => URL.revokeObjectURL(blobUrl), 60000);
   } catch (e) {
-    // 跨域失败时降级：直接打开链接
     const a = document.createElement('a');
     a.href = song.url;
     a.download = fileName;
