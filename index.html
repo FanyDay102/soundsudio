@@ -78,13 +78,16 @@
     color: var(--text-main);
     font-size: 20px;
     cursor: pointer;
-    opacity: 0.8;
-    width: 36px; height: 36px;
+    opacity: 0.85;
+    width: 40px; height: 40px;
     display: flex; justify-content: center; align-items: center;
     border-radius: 50%;
-    background: rgba(255,255,255,0.05);
+    background: rgba(255,255,255,0.06);
+    touch-action: manipulation;
+    transition: background 0.2s, opacity 0.2s, transform 0.1s;
   }
   .nav-icon:hover { background: rgba(255,255,255,0.15); opacity: 1; }
+  .nav-icon:active { transform: scale(0.92); background: rgba(255,255,255,0.2); }
 
   .nav-tools { display: flex; gap: 8px; align-items: center; }
   .url-btn {
@@ -257,7 +260,8 @@
   }
 
   .list-header { padding: 24px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-  .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+  .header-top { display: flex; justify-content: flex-start; align-items: center; margin-bottom: 16px; }
+  
   .mobile-back-btn { display: none; }
 
   .header-top h2 { font-size: 18px; font-weight: 600; }
@@ -361,6 +365,7 @@
   .float-close:hover { color: #fff; }
   .float-text { pointer-events: none; padding: 10px; text-shadow: 0 2px 5px rgba(0,0,0,0.8); }
 
+  /* ================= 移动端适配 ================= */
   @media (max-width: 768px) {
     body { padding: 0; align-items: flex-start; }
     .main-container { flex-direction: column; height: 100dvh; overflow: hidden; }
@@ -368,13 +373,14 @@
     .player-page { 
       padding: 20px; 
       padding-top: 10px; 
-      flex: 1; 
-      background: transparent; 
-      backdrop-filter: none;
+      flex: none;
       width: 100vw;
       height: 100%;
       position: absolute;
       top: 0; left: 0;
+      background: transparent; 
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
       transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       z-index: 10;
     }
@@ -391,30 +397,48 @@
     .progress-area { margin-top: 20px; }
     .controls { margin-top: 15px; margin-bottom: 10px; }
     .btn-play-main { width: 56px; height: 56px; font-size: 24px; }
-    
+
+    /* 手机端列表页：全屏滑入 */
     .list-page { 
       position: absolute;
       top: 0; left: 0;
       width: 100vw;
       height: 100%;
       min-width: 100%;
+      flex: none;
       background: var(--bg-color);
       border-left: none;
       transform: translateX(100%);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       z-index: 20;
     }
 
-    .main-container.show-list .player-page { transform: translateX(-20%); }
-    .main-container.show-list .list-page { transform: translateX(0); }
+    /* 滑入状态 */
+    .main-container.show-list .player-page {
+      transform: translateX(-20%);
+    }
+    .main-container.show-list .list-page {
+      transform: translateX(0);
+    }
 
+    /* 返回按钮显示 */
     .mobile-back-btn {
-      display: flex; justify-content: center; align-items: center;
-      width: 36px; height: 36px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 36px;
+      height: 36px;
       border-radius: 50%;
       background: rgba(255,255,255,0.1);
-      cursor: pointer; margin-right: 12px;
+      cursor: pointer;
+      margin-right: 12px;
       color: var(--text-main);
+      flex-shrink: 0;
+      touch-action: manipulation;
+      transition: background 0.2s, transform 0.1s;
     }
+    .mobile-back-btn:hover { background: rgba(255,255,255,0.18); }
+    .mobile-back-btn:active { transform: scale(0.92); }
     .mobile-back-btn svg {
       width: 20px; height: 20px;
       fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
@@ -427,8 +451,7 @@
     .tag-input-wrap { margin-left: 0; }
   }
 
-  .header-top { justify-content: flex-start; }
-
+  /* 齿轮按钮 */
   .gear-btn {
     margin-left: auto;
     width: 34px; height: 34px;
@@ -634,16 +657,22 @@
 <div class="main-container" id="mainContainer">
   <div class="bg-blur" id="bgBlur"></div>
 
+  <!-- ================= 播放页 ================= -->
   <section class="player-page">
     <div class="player-nav">
-      <div class="nav-icon" id="mobileListBtn" title="播放列表">
-        <svg viewBox="0 0 24 24" style="width:20px; height:20px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round;"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      <!-- ★ 三条杠：手机端点击进入列表页 -->
+      <div class="nav-icon" id="mobileListBtn" title="播放列表" role="button" aria-label="打开播放列表">
+        <svg viewBox="0 0 24 24" style="width:20px; height:20px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round;">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
       </div>
       <div class="nav-tools">
         <button class="url-btn" id="converterBtn">转换器</button>
         <button class="url-btn" id="searchBtn">search</button>
       </div>
-      <div class="nav-icon" style="opacity:0;">⋮</div>
+      <div class="nav-icon" style="opacity:0; pointer-events:none;">⋮</div>
     </div>
 
     <div class="cover-area">
@@ -694,10 +723,12 @@
     </div>
   </section>
 
+  <!-- ================= 列表页 ================= -->
   <section class="list-page">
     <div class="list-header">
       <div class="header-top">
-        <div class="mobile-back-btn" id="backToPlayerBtn">
+        <!-- ★ 手机端返回按钮：点击回到播放页 -->
+        <div class="mobile-back-btn" id="backToPlayerBtn" role="button" aria-label="返回播放页">
           <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
         </div>
         <h2>播放列表 <span id="songCount">(0)</span></h2>
@@ -928,6 +959,30 @@ function getCoverUrl(seed) {
 }
 
 /* =========================================================
+   ★ 视图切换：三条杠 → 列表页 / 返回按钮 → 播放页
+   ========================================================= */
+function openListView() {
+  mainContainer.classList.add('show-list');
+}
+function closeListView() {
+  if (selectionMode) { exitSelectionMode(); return; }
+  mainContainer.classList.remove('show-list');
+}
+
+if (mobileListBtn) {
+  mobileListBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    openListView();
+  });
+}
+if (backToPlayerBtn) {
+  backToPlayerBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    closeListView();
+  });
+}
+
+/* =========================================================
    IndexedDB：缓存目录 Handle 持久化
    ========================================================= */
 const FS_DB = 'mp_fs_v1';
@@ -1107,7 +1162,7 @@ function addLocalFiles(fileList) {
   if (added > 0) {
     renderPlaylist();
     updateTagSelect();
-    mainContainer.classList.add('show-list');
+    openListView();
     setTimeout(() => {
       alert(`已添加 ${added} 个本地文件到播放列表`);
     }, 50);
@@ -1300,23 +1355,23 @@ closeFloatBtn.addEventListener('click', () => {
   floatLyricBtn.classList.remove('active');
 });
 
-let isDragging = false, startX, startY, initialLeft, initialTop;
+let isDraggingFloat = false, startXFloat, startYFloat, initialLeftFloat, initialTopFloat;
 inPageFloat.addEventListener('pointerdown', (e) => {
   if (e.target.closest('.float-close')) return;
-  isDragging = true;
-  startX = e.clientX; startY = e.clientY;
+  isDraggingFloat = true;
+  startXFloat = e.clientX; startYFloat = e.clientY;
   const rect = inPageFloat.getBoundingClientRect();
-  initialLeft = rect.left; initialTop = rect.top;
+  initialLeftFloat = rect.left; initialTopFloat = rect.top;
   inPageFloat.style.bottom = 'auto'; inPageFloat.style.right = 'auto';
   inPageFloat.setPointerCapture(e.pointerId);
 });
 inPageFloat.addEventListener('pointermove', (e) => {
-  if (!isDragging) return;
-  inPageFloat.style.left = `${initialLeft + (e.clientX - startX)}px`;
-  inPageFloat.style.top = `${initialTop + (e.clientY - startY)}px`;
+  if (!isDraggingFloat) return;
+  inPageFloat.style.left = `${initialLeftFloat + (e.clientX - startXFloat)}px`;
+  inPageFloat.style.top = `${initialTopFloat + (e.clientY - startYFloat)}px`;
 });
 inPageFloat.addEventListener('pointerup', (e) => {
-  isDragging = false;
+  isDraggingFloat = false;
   inPageFloat.releasePointerCapture(e.pointerId);
 });
 
@@ -1348,7 +1403,6 @@ async function fetchSongs() {
       };
     });
 
-    // 保留已添加的本地文件
     const localSongs = allSongs.filter(s => s.isLocal);
     allSongs = [...localSongs, ...remoteSongs];
 
@@ -1533,7 +1587,6 @@ downloadBtn.addEventListener('click', () => {
   const song = allSongs.find(s => s.path === activeMenuPath);
   if (song) {
     if (song.isLocal) {
-      // 本地文件不重复下载，直接把 File 另存
       const a = document.createElement('a');
       a.href = song.blobUrl;
       a.download = song.file ? song.file.name : (song.name + '.mp3');
@@ -1590,7 +1643,6 @@ function saveNewOrder() {
     if (iB !== -1) return 1;
     return 0;
   });
-  // 只保存远程歌曲顺序，本地文件刷新后不复存在
   localStorage.setItem('mp_song_order', JSON.stringify(allSongs.filter(s => !s.isLocal).map(s => s.path)));
 }
 
@@ -1740,8 +1792,9 @@ playlistEl.addEventListener('click', (e) => {
   const index = parseInt(li.dataset.index);
   loadSong(index);
   
+  // 手机端选中歌曲后自动返回播放页
   if (window.innerWidth <= 768) {
-    mainContainer.classList.remove('show-list');
+    closeListView();
   }
 });
 
@@ -1963,7 +2016,6 @@ function applyBatchTag(isRemove) {
 async function doCacheSelected() {
   if (selectedPaths.size === 0) { alert('请先勾选歌曲'); return; }
 
-  // 过滤掉本地文件（已在本地，无需缓存）
   const paths = [...selectedPaths].filter(p => {
     const s = allSongs.find(x => x.path === p);
     return s && !s.isLocal;
