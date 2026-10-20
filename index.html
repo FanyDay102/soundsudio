@@ -278,6 +278,24 @@
     background: rgba(0,0,0,0.2); color: #fff; outline: none; font-size: 13px; cursor: pointer;
   }
   .tag-select option { background: #1e293b; color: #fff; }
+
+  /* 搜索框 */
+  .song-search-input {
+    flex: 1;
+    min-width: 130px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(0,0,0,0.2);
+    color: #fff;
+    outline: none;
+    font-size: 13px;
+    transition: 0.2s;
+    font-family: inherit;
+  }
+  .song-search-input::placeholder { color: rgba(255,255,255,0.4); }
+  .song-search-input:focus { border-color: var(--primary); }
+
   .tag-input-wrap { display: flex; gap: 6px; margin-left: auto; }
   .tag-input {
     padding: 6px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);
@@ -429,6 +447,7 @@
     
     .list-header { padding: 20px; }
     .tag-manager { margin-top: 10px; }
+    .tag-input-wrap { margin-left: 0; }
   }
 
   /* =========================================================
@@ -735,6 +754,7 @@
         <select class="tag-select" id="filterSelect">
           <option value="">🎵 全部歌曲</option>
         </select>
+        <input type="text" class="song-search-input" id="songSearchInput" placeholder="🔍 搜索歌名..." autocomplete="off">
         <div class="tag-input-wrap">
           <input type="text" class="tag-input" id="newTagInput" placeholder="新标签...">
           <button class="btn-add-tag" id="addTagBtn">创建</button>
@@ -888,6 +908,7 @@ const playlistEl = document.getElementById('playlist');
 const contextMenu = document.getElementById('contextMenu');
 const downloadBtn = document.getElementById('downloadBtn');
 const menuTags = document.getElementById('menuTags');
+const songSearchInput = document.getElementById('songSearchInput');
 
 const listPage = document.querySelector('.list-page');
 const settingsPanel = document.getElementById('settingsPanel');
@@ -1182,12 +1203,27 @@ function applySavedOrder() {
 
 function updateTagSelect() {
   const currentVal = filterSelect.value;
-  filterSelect.innerHTML = '<option value="">🎵 全部歌曲</option>' + 
+  filterSelect.innerHTML =
+    '<option value="">🎵 全部歌曲</option>' +
+    '<option value="__untagged__">🏷️ 未分类</option>' +
     globalTags.map(tag => `<option value="${tag}">${tag}</option>`).join('');
-  if (globalTags.includes(currentVal)) filterSelect.value = currentVal;
+
+  // 保持原有选择：空值、未分类、或仍存在的标签
+  if (currentVal === '' || currentVal === '__untagged__' || globalTags.includes(currentVal)) {
+    filterSelect.value = currentVal;
+  } else {
+    filterSelect.value = '';
+  }
 }
 
 filterSelect.addEventListener('change', renderPlaylist);
+
+// 搜索框：输入防抖过滤（150ms）
+let searchDebounceTimer = null;
+songSearchInput.addEventListener('input', () => {
+  clearTimeout(searchDebounceTimer);
+  searchDebounceTimer = setTimeout(renderPlaylist, 150);
+});
 
 addTagBtn.addEventListener('click', () => {
   const val = newTagInput.value.trim();
@@ -1201,10 +1237,20 @@ addTagBtn.addEventListener('click', () => {
 
 function renderPlaylist() {
   const filterTag = filterSelect.value;
+  const searchTerm = (songSearchInput.value || '').trim().toLowerCase();
+
   displaySongs = allSongs.filter(song => {
-    if (!filterTag) return true;
-    const tags = songTagsMap[song.path] || [];
-    return tags.includes(filterTag);
+    // 标签筛选
+    if (filterTag === '__untagged__') {
+      const tags = songTagsMap[song.path] || [];
+      if (tags.length > 0) return false;
+    } else if (filterTag) {
+      const tags = songTagsMap[song.path] || [];
+      if (!tags.includes(filterTag)) return false;
+    }
+    // 歌名搜索
+    if (searchTerm && !song.name.toLowerCase().includes(searchTerm)) return false;
+    return true;
   });
 
   songCount.textContent = `(${displaySongs.length})`;
