@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<!-- 👇 新增的代码：PWA 应用清单 👇 -->
+<link rel="manifest" href="manifest.json">
+<!-- 👆 新增的代码 👆 -->
 <title>沉浸式音乐播放器</title>
 <style>
   :root {
@@ -1435,7 +1438,7 @@ async function fetchSongs() {
     try {
       localStorage.setItem('mp_remote_songs', JSON.stringify(
         remoteSongs.map(s => ({ name: s.name, path: s.path }))
-      ));
+      );
     } catch (e) {}
 
     if (currentIndex === -1) {
