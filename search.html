@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>多源音乐搜索 · Audius / Jamendo / ccMixter</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --panel: #1e293b;
+    --panel-soft: rgba(30, 41, 59, 0.7);
+    --border: rgba(255, 255, 255, 0.08);
+    --text: #f1f5f9;
+    --sub: #94a3b8;
+    --primary: #ef4444;
+    --primary-dark: #dc2626;
+    --green: #10b981;
+    --amber: #f59e0b;
+    --blue: #3b82f6;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-bottom: 100px;
+  }
+  .container {
+    width: 100%;
+    max-width: 820px;
+    padding: 40px 20px 20px;
+  }
+
+  h1 { font-size: 24px; font-weight: 700; margin-bottom: 6px; letter-spacing: -0.3px; }
+  .subtitle { font-size: 13px; color: var(--sub); line-height: 1.7; margin-bottom: 28px; }
+  .subtitle a { color: var(--primary); text-decoration: none; }
+  .subtitle a:hover { text-decoration: underline; }
+
+  /* 搜索栏 */
+  .search-box { display: flex; gap: 10px; margin-bottom: 16px; }
+  .search-box input {
+    flex: 1;
+    padding: 14px 18px;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    background: var(--panel);
+    color: var(--text);
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .search-box input:focus { border-color: var(--primary); }
+  .search-box button {
+    padding: 0 28px;
+    border-radius: 14px;
+    border: none;
+    background: var(--primary);
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    white-space: nowrap;
+  }
+  .search-box button:hover { background: var(--primary-dark); }
+  .search-box button:active { transform: scale(0.97); }
+  .search-box button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  /* 数据源开关 */
+  .sources {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+    align-items: center;
+  }
+  .source-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--panel-soft);
+    font-size: 12px;
+    color: var(--sub);
+    cursor: pointer;
+    transition: 0.2s;
+    user-select: none;
+  }
+  .source-chip:hover { border-color: rgba(255,255,255,0.2); }
+  .source-chip.active { border-color: var(--primary); color: var(--text); background: rgba(239,68,68,0.12); }
+  .source-chip input { display: none; }
+  .source-chip .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--sub); }
+  .source-chip.active .dot { background: var(--primary); }
+
+  .jamendo-key-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    align-items: center;
+  }
+  .jamendo-key-row input {
+    flex: 1;
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--panel);
+    color: var(--text);
+    font-size: 13px;
+    outline: none;
+  }
+  .jamendo-key-row input:focus { border-color: var(--amber); }
+  .jamendo-key-row button {
+    padding: 10px 16px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--panel);
+    color: var(--text);
+    font-size: 13px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .jamendo-key-row button:hover { background: rgba(255,255,255,0.08); }
+
+  /* 状态 */
+  .status {
+    font-size: 13px;
+    color: var(--sub);
+    text-align: center;
+    padding: 50px 0;
+  }
+  .status.error { color: #f87171; }
+
+  /* 结果 */
+  .results { display: flex; flex-direction: column; gap: 8px; }
+  .track {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: var(--panel-soft);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 12px 14px;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .track:hover { border-color: rgba(255,255,255,0.18); background: rgba(30,41,59,0.9); }
+  .track.playing { border-color: var(--primary); background: rgba(239,68,68,0.08); }
+
+  .cover {
+    width: 54px;
+    height: 54px;
+    border-radius: 10px;
+    object-fit: cover;
+    flex-shrink: 0;
+    background: #334155;
+  }
+  .info { flex: 1; min-width: 0; }
+  .title {
+    font-size: 14px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .artist {
+    font-size: 12px;
+    color: var(--sub);
+    margin-top: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .meta {
+    font-size: 11px;
+    color: #64748b;
+    margin-top: 5px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .badge {
+    padding: 1px 8px;
+    border-radius: 5px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+  }
+  .badge.audius { background: rgba(139,92,246,0.18); color: #c4b5fd; }
+  .badge.jamendo { background: rgba(16,185,129,0.15); color: #6ee7b7; }
+  .badge.ccmixter { background: rgba(59,130,246,0.15); color: #93c5fd; }
+  .badge.dl { background: rgba(16,185,129,0.12); color: var(--green); }
+  .badge.no-dl { background: rgba(245,158,11,0.12); color: var(--amber); }
+
+  .actions { display: flex; gap: 6px; flex-shrink: 0; }
+  .btn-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255,255,255,0.06);
+    color: var(--text);
+    font-size: 15px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.2s;
+  }
+  .btn-icon:hover { background: rgba(255,255,255,0.15); }
+  .btn-icon:disabled { opacity: 0.35; cursor: not-allowed; }
+  .btn-icon.play { background: var(--primary); color: #fff; }
+  .btn-icon.play:hover { background: var(--primary-dark); }
+
+  /* 底部播放器 */
+  .player-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(15,23,42,0.92);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid var(--border);
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    z-index: 100;
+  }
+  .player-bar audio { flex: 1; height: 40px; outline: none; }
+  .now-playing {
+    font-size: 12px;
+    color: var(--sub);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 220px;
+  }
+  @media (max-width: 620px) {
+    .now-playing { display: none; }
+    .search-box { flex-direction: column; }
+    .search-box button { padding: 12px; }
+    .actions { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>🎧 多源音乐搜索</h1>
+  <p class="subtitle">
+    聚合搜索 <strong>Audius</strong>、<strong>Jamendo</strong>、<strong>ccMixter</strong> 三个 Creative Commons / 独立音乐曲库。
+    <br>支持在线试听、复制流媒体链接、下载可下载曲目。每条结果均标注数据来源。
+  </p>
+
+  <div class="search-box">
+    <input type="text" id="searchInput" placeholder="输入歌曲名、艺术家或关键词..." autofocus>
+    <button id="searchBtn">搜索</button>
+  </div>
+
+  <div class="sources">
+    <label class="source-chip active" data-source="audius">
+      <input type="checkbox" checked>
+      <span class="dot"></span> Audius
+    </label>
+    <label class="source-chip active" data-source="jamendo">
+      <input type="checkbox" checked>
+      <span class="dot"></span> Jamendo
+    </label>
+    <label class="source-chip active" data-source="ccmixter">
+      <input type="checkbox" checked>
+      <span class="dot"></span> ccMixter
+    </label>
+  </div>
+
+  <div class="jamendo-key-row" id="jamendoKeyRow" style="display:none;">
+    <input type="text" id="jamendoClientId" placeholder="Jamendo client_id（免费注册 developer.jamendo.com 获取）">
+    <button id="saveJamendoKey">保存</button>
+  </div>
+
+  <div id="status" class="status">输入关键词，同时搜索三个曲库。</div>
+  <div id="results" class="results"></div>
+</div>
+
+<div class="player-bar">
+  <div class="now-playing" id="nowPlaying">未播放</div>
+  <audio id="audio" controls preload="none"></audio>
+</div>
+
+<script>
+/* =========================================================
+   多源音乐搜索 — Audius / Jamendo / ccMixter
+   ========================================================= */
+
+const AUDIUS_DISCOVERY = 'https://discoveryprovider.audius.co';
+const AUDIUS_APP = 'MultiSourceMusicSearch';
+const JAMENDO_BASE = 'https://api.jamendo.com/v3.0';
+const CCMIXTER_BASE = 'http://ccmixter.org/api/query';
+
+const PROXIES = [
+  u => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
+  u => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(u)}`
+];
+
+const AUDIO = document.getElementById('audio');
+const NOW_PLAYING = document.getElementById('nowPlaying');
+const STATUS = document.getElementById('status');
+const RESULTS = document.getElementById('results');
+const JAMENDO_KEY_ROW = document.getElementById('jamendoKeyRow');
+const JAMENDO_INPUT = document.getElementById('jamendoClientId');
+
+let currentSource = '';
+
+/* ---------- 工具 ---------- */
+function escapeHtml(str) {
+  return String(str ?? '').replace(/[&<>"']/g, s => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[s]));
+}
+function formatDuration(sec) {
+  if (!sec || !isFinite(sec)) return '0:00';
+  const m = Math.floor(sec / 60);
+  const s = Math.floor(sec % 60);
+  return `${m}:${String(s).padStart(2, '0')}`;
+}
+async function fetchWithProxy(url) {
+  let lastErr;
+  for (const make of PROXIES) {
+    try {
+      const res = await fetch(make(url));
+      if (res.ok) return res;
+      lastErr = new Error(`HTTP ${res.status}`);
+    } catch (e) { lastErr = e; }
+  }
+  throw lastErr || new Error('代理请求失败');
+}
+
+/* ---------- Jamendo client_id ---------- */
+function getJamendoId() {
+  return localStorage.getItem('jamendo_client_id') || '';
+}
+function updateJamendoRow() {
+  const id = getJamendoId();
+  JAMENDO_INPUT.value = id;
+  JAMENDO_KEY_ROW.style.display = id ? 'none' : 'flex';
+}
+document.getElementById('saveJamendoKey').addEventListener('click', () => {
+  const val = JAMENDO_INPUT.value.trim();
+  if (!val) return alert('请填入 Jamendo client_id');
+  localStorage.setItem('jamendo_client_id', val);
+  updateJamendoRow();
+  STATUS.textContent = 'Jamendo client_id 已保存。';
+});
+
+/* ---------- Audius ---------- */
+async function searchAudius(query) {
+  const url = `${AUDIUS_DISCOVERY}/v1/tracks/search?query=${encodeURIComponent(query)}&app_name=${AUDIUS_APP}&limit=15`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`Audius HTTP ${res.status}`);
+  const json = await res.json();
+  return (json.data || []).map(t => ({
+    source: 'audius',
+    sourceLabel: 'Audius',
+    id: t.id,
+    title: t.title || '无标题',
+    artist: t.user?.name || '未知艺术家',
+    cover: t.artwork?.['150x150'] || t.artwork?.['480x480'] || '',
+    duration: t.duration,
+    downloadable: t.downloadable === true,
+    streamUrl: `${AUDIUS_DISCOVERY}/v1/tracks/${t.id}/stream?app_name=${AUDIUS_APP}`,
+    downloadUrl: t.downloadable ? `${AUDIUS_DISCOVERY}/v1/tracks/${t.id}/download?app_name=${AUDIUS_APP}` : null
+  }));
+}
+
+/* ---------- Jamendo ---------- */
+async function searchJamendo(query) {
+  const clientId = getJamendoId();
+  if (!clientId) throw new Error('Jamendo 需要 client_id，请先在下方填入。');
+  const target = `${JAMENDO_BASE}/tracks/?client_id=${encodeURIComponent(clientId)}&format=json&limit=15&search=${encodeURIComponent(query)}&include=musicinfo&audioformat=mp32`;
+  let data;
+  try {
+    const res = await fetch(target);
+    if (!res.ok) throw new Error(`Jamendo HTTP ${res.status}`);
+    data = await res.json();
+  } catch (e) {
+    const res = await fetchWithProxy(target);
+    data = await res.json();
+  }
+  const tracks = data.results || [];
+  if (tracks.length === 0 && data.headers?.status === 'failed') {
+    throw new Error(data.headers?.error_message || 'Jamendo 返回错误');
+  }
+  return tracks.map(t => ({
+    source: 'jamendo',
+    sourceLabel: 'Jamendo',
+    id: t.id,
+    title: t.name || '无标题',
+    artist: t.artist_name || '未知艺术家',
+    cover: t.image || t.album_image || '',
+    duration: t.duration,
+    downloadable: t.audiodownload_allowed === true,
+    streamUrl: t.audio || '',
+    downloadUrl: t.audiodownload_allowed ? (t.audiodownload || t.audio || '') : null
+  }));
+}
+
+/* ---------- ccMixter ---------- */
+async function searchCcMixter(query) {
+  const target = `${CCMIXTER_BASE}?f=json&search=${encodeURIComponent(query)}&limit=15&sort=rank`;
+  let data;
+  try {
+    const res = await fetch(target);
+    if (!res.ok) throw new Error(`ccMixter HTTP ${res.status}`);
+    data = await res.json();
+  } catch (e) {
+    const res = await fetchWithProxy(target);
+    data = await res.json();
+  }
+  const items = Array.isArray(data) ? data : (data.records || []);
+  return items.map(t => ({
+    source: 'ccmixter',
+    sourceLabel: 'ccMixter',
+    id: t.upload_id || t.id,
+    title: t.upload_name || t.name || '无标题',
+    artist: t.user_name || t.artist || '未知艺术家',
+    cover: t.upload_image || t.image || '',
+    duration: t.file_page ? null : null,
+    downloadable: true,
+    streamUrl: t.download_url || t.file_url || t.url || '',
+    downloadUrl: t.download_url || t.file_url || t.url || ''
+  })).filter(t => t.streamUrl);
+}
+
+/* ---------- 聚合搜索 ---------- */
+async function aggregateSearch(query) {
+  const selected = [...document.querySelectorAll('.source-chip.active')].map(el => el.dataset.source);
+  if (selected.length === 0) {
+    STATUS.className = 'status error';
+    STATUS.textContent = '请至少选择一个数据源。';
+    return;
+  }
+
+  STATUS.className = 'status';
+  STATUS.textContent = `正在搜索 ${selected.join(' / ')} ...`;
+  RESULTS.innerHTML = '';
+  document.getElementById('searchBtn').disabled = true;
+
+  const results = [];
+  const errors = [];
+
+  await Promise.all(selected.map(async source => {
+    try {
+      let items = [];
+      if (source === 'audius') items = await searchAudius(query);
+      else if (source === 'jamendo') items = await searchJamendo(query);
+      else if (source === 'ccmixter') items = await searchCcMixter(query);
+      results.push(...items);
+    } catch (e) {
+      errors.push(`${source}: ${e.message}`);
+    }
+  }));
+
+  // 按来源分组交错排列，避免某一家刷屏
+  const groups = { audius: [], jamendo: [], ccmixter: [] };
+  results.forEach(r => groups[r.source]?.push(r));
+  const merged = [];
+  let maxLen = Math.max(...Object.values(groups).map(g => g.length), 0);
+  for (let i = 0; i < maxLen; i++) {
+    for (const src of ['audius', 'jamendo', 'ccmixter']) {
+      if (groups[src][i]) merged.push(groups[src][i]);
+    }
+  }
+
+  document.getElementById('searchBtn').disabled = false;
+
+  if (merged.length === 0) {
+    STATUS.className = 'status';
+    STATUS.textContent = errors.length
+      ? `没有结果。\n${errors.join('\n')}`
+      : '没有找到相关曲目，换个关键词试试。';
+    return;
+  }
+
+  renderTracks(merged);
+  STATUS.className = 'status';
+  STATUS.textContent = `共 ${merged.length} 条结果` + (errors.length ? `（部分源失败：${errors.join('；')}）` : '');
+}
+
+/* ---------- 渲染 ---------- */
+function renderTracks(tracks) {
+  RESULTS.innerHTML = tracks.map(t => {
+    const dlBadge = t.downloadable
+      ? '<span class="badge dl">可下载</span>'
+      : '<span class="badge no-dl">仅流媒体</span>';
+    return `
+      <div class="track" data-source="${t.source}" data-id="${t.id}" data-stream="${encodeURIComponent(t.streamUrl)}" data-download="${encodeURIComponent(t.downloadUrl || '')}">
+        <img class="cover" src="${escapeHtml(t.cover)}" alt="" loading="lazy" onerror="this.style.opacity='0.15'">
+        <div class="info">
+          <div class="title">${escapeHtml(t.title)}</div>
+          <div class="artist">${escapeHtml(t.artist)}</div>
+          <div class="meta">
+            <span class="badge ${t.source}">${t.sourceLabel}</span>
+            ${t.duration ? formatDuration(t.duration) + ' · ' : ''}${dlBadge}
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn-icon play" title="试听" data-action="play">▶</button>
+          <button class="btn-icon" title="复制链接" data-action="copy">🔗</button>
+          <button class="btn-icon" title="下载" data-action="download" ${t.downloadable ? '' : 'disabled'}>⬇</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  RESULTS.querySelectorAll('[data-action]').forEach(btn => {
+    btn.addEventListener('click', handleAction);
+  });
+}
+
+/* ---------- 操作 ---------- */
+async function handleAction(e) {
+  const btn = e.currentTarget;
+  const action = btn.dataset.action;
+  const trackEl = btn.closest('.track');
+  const streamUrl = decodeURIComponent(trackEl.dataset.stream);
+  const downloadUrl = decodeURIComponent(trackEl.dataset.download);
+  const source = trackEl.dataset.source;
+  const title = trackEl.querySelector('.title').textContent;
+  const artist = trackEl.querySelector('.artist').textContent;
+
+  if (action === 'play') {
+    AUDIO.src = streamUrl;
+    AUDIO.play().catch(err => {
+      console.warn(err);
+      STATUS.className = 'status error';
+      STATUS.textContent = '播放失败，可能是浏览器限制或音频不可用。';
+    });
+    document.querySelectorAll('.track').forEach(el => el.classList.remove('playing'));
+    trackEl.classList.add('playing');
+    NOW_PLAYING.textContent = `${title} — ${artist} (${source})`;
+    currentSource = source;
+  }
+
+  if (action === 'copy') {
+    try {
+      await navigator.clipboard.writeText(streamUrl);
+      btn.textContent = '✓';
+      btn.style.color = 'var(--green)';
+      setTimeout(() => { btn.textContent = '🔗'; btn.style.color = ''; }, 1500);
+    } catch {
+      prompt('手动复制：', streamUrl);
+    }
+  }
+
+  if (action === 'download') {
+    if (!downloadUrl) return;
+    btn.disabled = true;
+    btn.textContent = '⏳';
+    try {
+      const res = await fetch(downloadUrl);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${title.replace(/[/\\?%*:|"<>]/g, '_')}.mp3`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 5000);
+      btn.textContent = '✓';
+      btn.style.color = 'var(--green)';
+    } catch (err) {
+      console.error(err);
+      btn.textContent = '✗';
+      alert(`下载失败：${err.message}\n\n可尝试点击 🔗 复制链接，在新标签页打开后右键保存。`);
+    } finally {
+      btn.disabled = false;
+      setTimeout(() => { btn.textContent = '⬇'; btn.style.color = ''; }, 2000);
+    }
+  }
+}
+
+/* ---------- 数据源 chip ---------- */
+document.querySelectorAll('.source-chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    const cb = chip.querySelector('input');
+    cb.checked = !cb.checked;
+    chip.classList.toggle('active', cb.checked);
+    if (chip.dataset.source === 'jamendo') {
+      JAMENDO_KEY_ROW.style.display = cb.checked && !getJamendoId() ? 'flex' : 'none';
+    }
+  });
+});
+
+/* ---------- 初始化 ---------- */
+document.getElementById('searchBtn').addEventListener('click', () => {
+  aggregateSearch(document.getElementById('searchInput').value.trim());
+});
+document.getElementById('searchInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') aggregateSearch(e.target.value.trim());
+});
+
+updateJamendoRow();
+</script>
+</body>
+</html>
