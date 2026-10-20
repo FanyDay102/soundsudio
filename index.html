@@ -53,7 +53,7 @@
     transition: background-image 0.5s;
   }
 
-  /* ================= 播放页 ================= */
+  /* ================= 播放页 (左侧/全屏) ================= */
   .player-page {
     flex: 1;
     min-width: 0;
@@ -240,7 +240,7 @@
 
   .hide { display: none !important; }
 
-  /* ================= 列表页 ================= */
+  /* ================= 列表页 (右侧/移动端全屏) ================= */
   .list-page {
     flex: 0 0 400px;
     min-width: 400px;
@@ -250,26 +250,17 @@
     border-left: 1px solid var(--glass-border);
     display: flex; flex-direction: column; height: 100%; z-index: 20;
     transition: transform 0.3s ease-in-out;
+    position: relative;
   }
 
   .list-header { padding: 24px; border-bottom: 1px solid rgba(255,255,255,0.05); }
   .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
   
+  /* 移动端的返回按钮，桌面端隐藏 */
   .mobile-back-btn { display: none; }
 
   .header-top h2 { font-size: 18px; font-weight: 600; }
   .header-top span { font-size: 13px; color: var(--text-sub); font-weight: 400; }
-
-  .header-btn {
-    background: rgba(255,255,255,0.08);
-    border: none; color: var(--text-main);
-    width: 34px; height: 34px; border-radius: 50%;
-    display: flex; justify-content: center; align-items: center;
-    cursor: pointer; margin-left: auto; flex-shrink: 0;
-    transition: background .2s, transform .3s;
-  }
-  .header-btn:hover { background: rgba(255,255,255,0.18); transform: rotate(60deg); }
-  .header-btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
   .tag-manager { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
   .tag-select {
@@ -353,123 +344,7 @@
   .float-close:hover { color: #fff; }
   .float-text { pointer-events: none; padding: 10px; text-shadow: 0 2px 5px rgba(0,0,0,0.8); }
 
-  /* ================= 设置页 ================= */
-  .settings-page {
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: #0f172a;
-    z-index: 40;
-    display: flex;
-    flex-direction: column;
-    transform: translateX(100%);
-    transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: -20px 0 60px rgba(0,0,0,0.6);
-  }
-  .settings-page.open { transform: translateX(0); }
-
-  .settings-header {
-    display: flex; align-items: center; gap: 12px;
-    padding: 20px; flex-shrink: 0;
-    border-bottom: 1px solid rgba(255,255,255,0.06);
-  }
-  .settings-header h2 { font-size: 17px; font-weight: 600; }
-
-  .settings-body {
-    flex: 1; overflow-y: auto; padding: 16px 20px 40px;
-    -webkit-overflow-scrolling: touch;
-  }
-  .settings-body::-webkit-scrollbar { width: 4px; }
-  .settings-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 2px; }
-
-  .setting-item {
-    display: flex; align-items: center; gap: 14px;
-    padding: 16px; border-radius: 14px;
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.06);
-    margin-bottom: 10px; cursor: pointer; transition: 0.2s;
-  }
-  .setting-item:hover { background: rgba(255,255,255,0.09); border-color: rgba(239,68,68,0.4); }
-  .setting-ico {
-    width: 38px; height: 38px; border-radius: 10px;
-    background: rgba(239,68,68,0.15); color: var(--primary);
-    display: flex; justify-content: center; align-items: center; flex-shrink: 0;
-  }
-  .setting-ico svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-  .setting-text { flex: 1; min-width: 0; }
-  .setting-text h3 { font-size: 14px; font-weight: 600; margin-bottom: 3px; }
-  .setting-text p { font-size: 11px; color: var(--text-sub); line-height: 1.5; }
-
-  .sel-toolbar {
-    display: flex; align-items: center; gap: 10px;
-    padding: 10px 12px; background: rgba(255,255,255,0.04);
-    border-radius: 10px; margin-bottom: 10px; font-size: 13px;
-  }
-  .sel-all-label { display: flex; align-items: center; gap: 8px; cursor: pointer; }
-  .sel-all-label input, .sel-item input[type=checkbox] { width: 16px; height: 16px; accent-color: var(--primary); cursor: pointer; }
-  .sel-count { margin-left: auto; color: var(--text-sub); font-size: 12px; }
-
-  .sel-list { list-style: none; }
-  .sel-item {
-    display: flex; align-items: center; gap: 12px;
-    padding: 10px 12px; border-radius: 10px; cursor: pointer;
-  }
-  .sel-item:hover { background: rgba(255,255,255,0.05); }
-  .sel-info { flex: 1; min-width: 0; }
-  .sel-name { font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .sel-path { font-size: 11px; color: var(--text-sub); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
-
-  .form-field { margin-bottom: 14px; }
-  .form-field label { display: block; font-size: 12px; color: var(--text-sub); margin-bottom: 6px; }
-  .form-field input[type=text], .form-field select {
-    width: 100%; padding: 10px 12px; border-radius: 10px;
-    background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.1);
-    color: #fff; font-size: 13px; outline: none; font-family: inherit;
-  }
-  .form-field input[type=text]:focus, .form-field select:focus { border-color: var(--primary); }
-  .form-field select option { background: #1e293b; color: #fff; }
-
-  .file-drop {
-    border: 2px dashed rgba(255,255,255,0.15); border-radius: 14px;
-    padding: 28px 16px; text-align: center; cursor: pointer; transition: 0.2s;
-    font-size: 13px; color: var(--text-sub); margin-bottom: 14px; line-height: 1.7;
-  }
-  .file-drop:hover, .file-drop.dragover { border-color: var(--primary); background: rgba(239,68,68,0.06); color: #fff; }
-
-  .btn-primary {
-    background: var(--primary); color: #fff; border: none;
-    padding: 13px 18px; border-radius: 10px;
-    font-size: 14px; font-weight: 600; cursor: pointer;
-    transition: 0.2s; width: 100%; font-family: inherit;
-  }
-  .btn-primary:hover { background: var(--primary-dark); }
-  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
-  .btn-primary.btn-danger { background: #dc2626; }
-  .btn-primary.btn-danger:hover { background: #b91c1c; }
-
-  .btn-ghost {
-    background: rgba(255,255,255,0.08); color: #fff; border: none;
-    padding: 13px 18px; border-radius: 10px; font-size: 14px;
-    font-weight: 600; cursor: pointer; transition: 0.2s; font-family: inherit;
-  }
-  .btn-ghost:hover { background: rgba(255,255,255,0.16); }
-
-  .btn-row { display: flex; gap: 10px; }
-  .btn-row > button { flex: 1; width: auto; }
-
-  .progress-log {
-    font-size: 12px; max-height: 180px; overflow-y: auto;
-    background: rgba(0,0,0,0.3); border-radius: 10px; padding: 10px 12px;
-    margin-top: 12px; line-height: 1.8; display: none;
-    white-space: pre-wrap; word-break: break-all;
-  }
-  .progress-log.show { display: block; }
-  .progress-log::-webkit-scrollbar { width: 4px; }
-  .progress-log::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 2px; }
-  .log-ok { color: #4ade80; }
-  .log-err { color: #f87171; }
-  .log-info { color: #94a3b8; }
-
-  /* ================= 移动端适配 ================= */
+  /* ================= 移动端适配 (全屏切换) ================= */
   @media (max-width: 768px) {
     body { padding: 0; align-items: flex-start; }
     .main-container { flex-direction: column; height: 100dvh; overflow: hidden; }
@@ -501,6 +376,7 @@
     .controls { margin-top: 15px; margin-bottom: 10px; }
     .btn-play-main { width: 56px; height: 56px; font-size: 24px; }
     
+    /* 移动端列表页：全屏，滑动进入 */
     .list-page { 
       position: absolute;
       top: 0; left: 0;
@@ -513,9 +389,15 @@
       z-index: 20;
     }
 
-    .main-container.show-list .player-page { transform: translateX(-20%); }
-    .main-container.show-list .list-page { transform: translateX(0); }
+    /* 当触发 show-list 时的动画 */
+    .main-container.show-list .player-page {
+      transform: translateX(-20%); /* 播放页左移一点，产生景深效果 */
+    }
+    .main-container.show-list .list-page {
+      transform: translateX(0);
+    }
 
+    /* 显示返回按钮并调整布局 */
     .mobile-back-btn {
       display: flex;
       justify-content: center;
@@ -527,7 +409,6 @@
       cursor: pointer;
       margin-right: 12px;
       color: var(--text-main);
-      flex-shrink: 0;
     }
     .mobile-back-btn svg {
       width: 20px; height: 20px;
@@ -538,7 +419,184 @@
     
     .list-header { padding: 20px; }
     .tag-manager { margin-top: 10px; }
-    .settings-body { padding: 14px 16px 40px; }
+  }
+
+  /* =========================================================
+     新增：齿轮按钮 / 设置面板 / 批量选择
+     ========================================================= */
+
+  /* ---------- 顶部栏调整 ---------- */
+  .header-top { justify-content: flex-start; }
+
+  /* ---------- 齿轮按钮 ---------- */
+  .gear-btn {
+    margin-left: auto;
+    width: 34px; height: 34px;
+    display: flex; justify-content: center; align-items: center;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.12);
+    background: rgba(255,255,255,0.06);
+    color: var(--text-main);
+    cursor: pointer;
+    transition: all 0.25s;
+    flex-shrink: 0;
+    padding: 0;
+    font-size: 15px;
+    line-height: 1;
+  }
+  .gear-btn:hover { background: rgba(255,255,255,0.16); transform: rotate(45deg); }
+  .gear-btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .gear-btn:active { transform: rotate(45deg) scale(0.92); }
+
+  #cancelSelectionBtn:hover,
+  #cancelSelectionBtn:active { transform: none; }
+  #cancelSelectionBtn:hover { background: rgba(255,255,255,0.16); }
+  #cancelSelectionBtn:active { transform: scale(0.92); }
+
+  /* 选择模式下的"已选"与取消按钮 */
+  .selection-count { display: none; font-size: 13px; font-weight: 600; color: var(--primary); margin-left: 10px; white-space: nowrap; }
+  .list-page.selection-mode .selection-count { display: inline-block; }
+  #cancelSelectionBtn { display: none; }
+  .list-page.selection-mode #cancelSelectionBtn { display: flex; }
+  .list-page.selection-mode #settingsBtn { display: none; }
+  .list-page.selection-mode .tag-manager { display: none; }
+  .list-page.selection-mode .btn-more { display: none; }
+
+  /* ---------- 设置面板 ---------- */
+  .settings-panel {
+    position: absolute;
+    inset: 0;
+    z-index: 30;
+    display: flex;
+    flex-direction: column;
+    background: rgba(15, 23, 42, 0.97);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    transform: translateX(100%);
+    transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+  }
+  .settings-panel.open { transform: translateX(0); }
+
+  .settings-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px 24px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    flex-shrink: 0;
+  }
+  .settings-header h3 { font-size: 16px; font-weight: 600; }
+  .settings-close {
+    width: 32px; height: 32px; border-radius: 50%;
+    border: none; background: rgba(255,255,255,0.08);
+    color: var(--text-main); cursor: pointer; font-size: 14px;
+    display: flex; justify-content: center; align-items: center;
+    transition: 0.2s;
+  }
+  .settings-close:hover { background: rgba(255,255,255,0.18); }
+
+  .settings-body {
+    flex: 1; overflow-y: auto;
+    padding: 14px 16px 24px;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .settings-body::-webkit-scrollbar { width: 4px; }
+  .settings-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 2px; }
+
+  .setting-item {
+    display: flex; align-items: center; gap: 14px;
+    width: 100%; padding: 14px 16px;
+    border-radius: 14px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.07);
+    color: var(--text-main);
+    cursor: pointer; text-align: left;
+    transition: all 0.2s;
+  }
+  .setting-item:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.15); transform: translateY(-1px); }
+  .setting-item:active { transform: scale(0.99); }
+  .setting-item .si-icon {
+    width: 38px; height: 38px; border-radius: 11px; flex-shrink: 0;
+    display: flex; justify-content: center; align-items: center;
+    background: rgba(239,68,68,0.15); color: #fca5a5;
+  }
+  .setting-item .si-icon svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .setting-item .si-text { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  .setting-item .si-title { font-size: 14px; font-weight: 600; margin-bottom: 3px; }
+  .setting-item .si-desc { font-size: 11.5px; color: var(--text-sub); line-height: 1.45; }
+  .setting-item .si-arrow { color: var(--text-sub); font-size: 18px; flex-shrink: 0; }
+
+  /* ---------- 批量选择 ---------- */
+  .track-item.selectable { gap: 10px; }
+  .track-check {
+    width: 20px; height: 20px; border-radius: 50%; flex-shrink: 0;
+    border: 2px solid rgba(255,255,255,0.3);
+    display: flex; justify-content: center; align-items: center;
+    transition: all 0.15s;
+  }
+  .track-item.selected .track-check {
+    background: var(--primary);
+    border-color: var(--primary);
+    box-shadow: 0 0 10px rgba(239,68,68,0.5);
+  }
+  .track-item.selected .track-check::after {
+    content: '';
+    width: 5px; height: 9px;
+    border: solid #fff;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg) translate(-1px, -1px);
+  }
+  .track-item.selected { background: rgba(239,68,68,0.16); }
+
+  .batch-bar {
+    display: none;
+    padding: 12px 16px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    background: rgba(15,23,42,0.92);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    flex-shrink: 0;
+  }
+  .batch-bar.show { display: block; }
+  .batch-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+
+  .batch-btn {
+    flex: 1; min-width: 92px;
+    padding: 11px 14px;
+    border-radius: 10px; border: none;
+    background: var(--primary); color: #fff;
+    font-size: 13px; font-weight: 600;
+    cursor: pointer; transition: 0.2s;
+    white-space: nowrap;
+  }
+  .batch-btn:hover { background: var(--primary-dark); }
+  .batch-btn.ghost {
+    background: rgba(255,255,255,0.08);
+    color: var(--text-main);
+    border: 1px solid rgba(255,255,255,0.12);
+  }
+  .batch-btn.ghost:hover { background: rgba(255,255,255,0.18); }
+  .batch-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+  .batch-select {
+    flex: 1; min-width: 110px;
+    padding: 11px 10px;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.12);
+    background: rgba(0,0,0,0.28);
+    color: #fff; font-size: 13px; outline: none;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  .batch-select:focus { border-color: var(--primary); }
+  .batch-select option { background: #1e293b; color: #fff; }
+
+  @media (max-width: 768px) {
+    .settings-header { padding: 18px 20px; }
+    .settings-body { padding: 12px 14px 24px; }
+    .setting-item { padding: 13px 14px; }
+    .batch-btn { min-width: 78px; padding: 10px 10px; font-size: 12.5px; }
+    .batch-select { min-width: 90px; font-size: 12.5px; padding: 10px 8px; }
   }
 </style>
 </head>
@@ -609,16 +667,23 @@
   <section class="list-page">
     <div class="list-header">
       <div class="header-top">
+        <!-- 移动端返回按钮 -->
         <div class="mobile-back-btn" id="backToPlayerBtn">
           <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
         </div>
         <h2>播放列表 <span id="songCount">(0)</span></h2>
-        <button class="header-btn" id="settingsBtn" title="设置">
+        <span class="selection-count" id="selectionCount">已选 0 首</span>
+
+        <!-- 设置齿轮 -->
+        <button class="gear-btn" id="settingsBtn" title="设置">
           <svg viewBox="0 0 24 24">
             <circle cx="12" cy="12" r="3"></circle>
-            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
           </svg>
         </button>
+
+        <!-- 退出选择模式 -->
+        <button class="gear-btn" id="cancelSelectionBtn" title="退出选择">✕</button>
       </div>
       <div class="tag-manager">
         <select class="tag-select" id="filterSelect">
@@ -633,122 +698,67 @@
     <ul class="playlist" id="playlist">
       <li style="padding:20px; text-align:center; color:#94a3b8;">加载中...</li>
     </ul>
-  </section>
 
-  <!-- ================= 设置页 ================= -->
-  <section class="settings-page" id="settingsPage">
-    <div class="settings-header">
-      <div class="mobile-back-btn" id="settingsBackBtn" style="display:flex;">
-        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
-      </div>
-      <h2 id="settingsTitle">设置</h2>
+    <!-- 批量操作栏 -->
+    <div class="batch-bar" id="batchBar">
+      <div class="batch-actions" id="batchActions"></div>
     </div>
 
-    <div class="settings-body" id="settingsBody">
+    <!-- 设置面板 -->
+    <div class="settings-panel" id="settingsPanel">
+      <div class="settings-header">
+        <h3>设置</h3>
+        <button class="settings-close" id="settingsCloseBtn">✕</button>
+      </div>
+      <div class="settings-body">
 
-      <!-- 主菜单 -->
-      <div class="settings-view" id="viewMenu">
-        <div class="setting-item" data-view="Upload">
-          <div class="setting-ico">
+        <button class="setting-item" data-action="upload">
+          <span class="si-icon">
             <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-          </div>
-          <div class="setting-text">
-            <h3>上传曲目</h3>
-            <p>选择 MP3 文件，直接提交到 GitHub 仓库</p>
-          </div>
-        </div>
+          </span>
+          <span class="si-text">
+            <span class="si-title">上传曲目</span>
+            <span class="si-desc">跳转到 GitHub 仓库上传新歌</span>
+          </span>
+          <span class="si-arrow">›</span>
+        </button>
 
-        <div class="setting-item" data-view="Delete">
-          <div class="setting-ico">
-            <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-          </div>
-          <div class="setting-text">
-            <h3>删除曲目</h3>
-            <p>批量勾选，同时删除仓库中的音频文件</p>
-          </div>
-        </div>
+        <button class="setting-item" data-action="delete">
+          <span class="si-icon">
+            <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path><path d="M10 11v6"></path><path d="M14 11v6"></path><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"></path></svg>
+          </span>
+          <span class="si-text">
+            <span class="si-title">删除曲目</span>
+            <span class="si-desc">跳转到仓库管理并删除歌曲文件</span>
+          </span>
+          <span class="si-arrow">›</span>
+        </button>
 
-        <div class="setting-item" data-view="Cache">
-          <div class="setting-ico">
+        <button class="setting-item" data-action="cache">
+          <span class="si-icon">
             <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-          </div>
-          <div class="setting-text">
-            <h3>缓存曲目</h3>
-            <p>批量把所选歌曲下载到本地</p>
-          </div>
-        </div>
+          </span>
+          <span class="si-text">
+            <span class="si-title">缓存曲目</span>
+            <span class="si-desc">批量勾选歌曲，一键下载到本地</span>
+          </span>
+          <span class="si-arrow">›</span>
+        </button>
 
-        <div class="setting-item" data-view="Tags">
-          <div class="setting-ico">
+        <button class="setting-item" data-action="tag">
+          <span class="si-icon">
             <svg viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>
-          </div>
-          <div class="setting-text">
-            <h3>批量标签</h3>
-            <p>为多首歌曲批量添加或移除标签</p>
-          </div>
-        </div>
-      </div>
+          </span>
+          <span class="si-text">
+            <span class="si-title">批量标签</span>
+            <span class="si-desc">为多首歌曲批量添加 / 移除标签</span>
+          </span>
+          <span class="si-arrow">›</span>
+        </button>
 
-      <!-- 上传 -->
-      <div class="settings-view hide" id="viewUpload">
-        <div class="form-field">
-          <label>目标文件夹（留空 = 仓库根目录）</label>
-          <input type="text" id="uploadDir" placeholder="例如：music">
-        </div>
-        <div class="file-drop" id="fileDrop">📁 点击选择 MP3 文件<br>或把文件拖拽到这里</div>
-        <input type="file" id="fileInput" accept=".mp3,audio/mpeg" multiple hidden>
-        <ul class="sel-list" id="uploadFileList"></ul>
-        <button class="btn-primary" id="doUploadBtn" disabled>开始上传</button>
-        <div class="progress-log" id="uploadLog"></div>
       </div>
-
-      <!-- 删除 -->
-      <div class="settings-view hide" id="viewDelete">
-        <div class="sel-toolbar">
-          <label class="sel-all-label"><input type="checkbox" id="delSelectAll"> 全选</label>
-          <span class="sel-count" id="delCount">已选 0 首</span>
-        </div>
-        <ul class="sel-list" id="delList"></ul>
-        <button class="btn-primary btn-danger" id="doDeleteBtn" disabled>删除所选曲目</button>
-        <div class="progress-log" id="deleteLog"></div>
-      </div>
-
-      <!-- 缓存 -->
-      <div class="settings-view hide" id="viewCache">
-        <div class="sel-toolbar">
-          <label class="sel-all-label"><input type="checkbox" id="cacheSelectAll"> 全选</label>
-          <span class="sel-count" id="cacheCount">已选 0 首</span>
-        </div>
-        <ul class="sel-list" id="cacheList"></ul>
-        <button class="btn-primary" id="doCacheBtn" disabled>缓存所选曲目</button>
-        <div class="progress-log" id="cacheLog"></div>
-      </div>
-
-      <!-- 批量标签 -->
-      <div class="settings-view hide" id="viewTags">
-        <div class="sel-toolbar">
-          <label class="sel-all-label"><input type="checkbox" id="tagSelectAll"> 全选</label>
-          <span class="sel-count" id="tagCount">已选 0 首</span>
-        </div>
-        <ul class="sel-list" id="tagList"></ul>
-        <div class="form-field" style="margin-top:14px;">
-          <label>选择已有标签</label>
-          <select id="tagPickSelect"></select>
-        </div>
-        <div class="form-field">
-          <label>或输入新标签（优先生效）</label>
-          <input type="text" id="tagPickInput" placeholder="新标签名称">
-        </div>
-        <div class="btn-row">
-          <button class="btn-primary" id="applyTagBtn">应用标签</button>
-          <button class="btn-ghost" id="removeTagBtn">移除标签</button>
-        </div>
-        <div class="progress-log" id="tagLog"></div>
-      </div>
-
     </div>
   </section>
-
 </div>
 
 <!-- 悬浮菜单 -->
@@ -773,19 +783,6 @@
    ========================================================= */
 const CONFIG = { owner: 'FanyDay102', repo: 'soundsudio', branch: 'main' };
 
-/* ★ 核心修改：彻底移除硬编码 Token，改为从 sessionStorage 获取或用户弹窗输入 */
-function getGitHubToken() {
-  let token = sessionStorage.getItem('gh_token');
-  if (!token) {
-    token = prompt("⚠️ 为了安全执行上传或删除操作，请输入你的 GitHub PAT (以 github_pat_ 开头)：\n\n(注意：Token 仅临时保存在当前浏览器中，关闭网页即失效)");
-    if (token) {
-      token = token.trim();
-      sessionStorage.setItem('gh_token', token);
-    }
-  }
-  return token;
-}
-
 let allSongs = [];
 let displaySongs = [];
 let currentIndex = -1;
@@ -793,12 +790,15 @@ let isPlaying = false;
 let repeatMode = 'all';
 let isShuffle = false;
 
-let currentLyrics = [];
+let currentLyrics = []; 
 let activeLyricIndex = -1;
 
 let globalTags = JSON.parse(localStorage.getItem('mp_tags_pool') || '[]');
 let songTagsMap = JSON.parse(localStorage.getItem('mp_song_tags') || '{}');
 let savedOrder = JSON.parse(localStorage.getItem('mp_song_order') || '[]');
+
+let selectionMode = null;        // null | 'cache' | 'tag'
+let selectedPaths = new Set();   // 批量模式下选中的歌曲 path
 
 // DOM
 const mainContainer = document.getElementById('mainContainer');
@@ -827,12 +827,29 @@ const contextMenu = document.getElementById('contextMenu');
 const downloadBtn = document.getElementById('downloadBtn');
 const menuTags = document.getElementById('menuTags');
 
+const listPage = document.querySelector('.list-page');
+const settingsPanel = document.getElementById('settingsPanel');
+const settingsBtn = document.getElementById('settingsBtn');
+const settingsCloseBtn = document.getElementById('settingsCloseBtn');
+const cancelSelectionBtn = document.getElementById('cancelSelectionBtn');
+const selectionCount = document.getElementById('selectionCount');
+const batchBar = document.getElementById('batchBar');
+const batchActions = document.getElementById('batchActions');
+
+// 控制按钮
 const mobileListBtn = document.getElementById('mobileListBtn');
 const backToPlayerBtn = document.getElementById('backToPlayerBtn');
 
-mobileListBtn.addEventListener('click', () => mainContainer.classList.add('show-list'));
-backToPlayerBtn.addEventListener('click', () => mainContainer.classList.remove('show-list'));
+// 切换视图逻辑
+mobileListBtn.addEventListener('click', () => {
+  mainContainer.classList.add('show-list');
+});
+backToPlayerBtn.addEventListener('click', () => {
+  if (selectionMode) { exitSelectionMode(); return; }
+  mainContainer.classList.remove('show-list');
+});
 
+// 图标 DOM
 const iconPlay = document.getElementById('icon-play');
 const iconPause = document.getElementById('icon-pause');
 const iconRepeatAll = document.getElementById('icon-repeat-all');
@@ -845,96 +862,8 @@ function getCoverUrl(seed) {
   return `https://picsum.photos/seed/${encodeURIComponent(seed)}/500/500`;
 }
 
-function escapeHtml(s) {
-  return String(s).replace(/[&<>"']/g, c => (
-    { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
-  ));
-}
-
 /* =========================================================
-   GitHub API 封装 (使用动态 Token)
-   ========================================================= */
-function encodePath(p) {
-  return p.split('/').map(encodeURIComponent).join('/');
-}
-
-async function ghApi(endpoint, options = {}) {
-  const token = getGitHubToken();
-  if (!token) throw new Error('未提供 GitHub Token，操作取消');
-
-  const res = await fetch(`https://api.github.com/repos/${CONFIG.owner}/${CONFIG.repo}/${endpoint}`, {
-    ...options,
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Accept': 'application/vnd.github+json',
-      'X-GitHub-Api-Version': '2022-11-28',
-      ...(options.headers || {})
-    }
-  });
-  
-  if (!res.ok) {
-    let msg = `${res.status} ${res.statusText}`;
-    try {
-      const j = await res.json();
-      if (j && j.message) msg = j.message;
-    } catch (e) { /* ignore */ }
-    
-    // 如果是 401 权限错误，清除失效的 Token
-    if (res.status === 401) {
-      sessionStorage.removeItem('gh_token');
-    }
-    throw new Error(msg);
-  }
-  
-  if (res.status === 204) return null;
-  return res.json();
-}
-
-function fileToBase64(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      const result = String(reader.result);
-      resolve(result.substring(result.indexOf(',') + 1));
-    };
-    reader.onerror = () => reject(new Error('文件读取失败'));
-    reader.readAsDataURL(file);
-  });
-}
-
-async function ghUpload(file, dir) {
-  const cleanDir = (dir || '').replace(/^\/+|\/+$/g, '');
-  const path = cleanDir ? `${cleanDir}/${file.name}` : file.name;
-  const base64 = await fileToBase64(file);
-  await ghApi(`contents/${encodePath(path)}`, {
-    method: 'PUT',
-    body: JSON.stringify({
-      message: `上传 ${file.name}（网页上传）`,
-      content: base64,
-      branch: CONFIG.branch
-    })
-  });
-  return path;
-}
-
-async function ghGetSha(path) {
-  const data = await ghApi(`contents/${encodePath(path)}?ref=${encodeURIComponent(CONFIG.branch)}`);
-  return data.sha;
-}
-
-async function ghDelete(path, sha) {
-  await ghApi(`contents/${encodePath(path)}`, {
-    method: 'DELETE',
-    body: JSON.stringify({
-      message: `删除 ${path}（网页删除）`,
-      sha,
-      branch: CONFIG.branch
-    })
-  });
-}
-
-/* =========================================================
-   歌词
+   核心：获取歌词
    ========================================================= */
 async function fetchLyrics(songName) {
   mainCover.classList.remove('lyrics-mode');
@@ -954,7 +883,7 @@ async function fetchLyrics(songName) {
   try {
     let apiUrl = `https://lrclib.net/api/get?track_name=${encodeURIComponent(title)}`;
     if (artist) apiUrl += `&artist_name=${encodeURIComponent(artist)}`;
-
+    
     let res = await fetch(apiUrl, { headers: { 'Lrclib-Client': 'MyHTMLMusicPlayer v1.0' } });
 
     if (res.status === 404) {
@@ -1008,11 +937,11 @@ function parseLRC(lrcText) {
   if (currentLyrics.length === 0) return;
 
   lyricsContainer.innerHTML = currentLyrics.map((lyric, index) => `
-    <div class="lyric-line" data-index="${index}" onclick="seekToLyric(${lyric.time})">${escapeHtml(lyric.text)}</div>
+    <div class="lyric-line" data-index="${index}" onclick="seekToLyric(${lyric.time})">${lyric.text}</div>
   `).join('');
 }
 
-window.seekToLyric = function (time) {
+window.seekToLyric = function(time) {
   if (audio.duration) audio.currentTime = time;
 };
 
@@ -1021,14 +950,17 @@ function syncLyrics(currentTime) {
 
   let newIndex = -1;
   for (let i = 0; i < currentLyrics.length; i++) {
-    if (currentTime >= currentLyrics[i].time) newIndex = i;
-    else break;
+    if (currentTime >= currentLyrics[i].time) {
+      newIndex = i;
+    } else {
+      break;
+    }
   }
 
   if (newIndex !== -1 && newIndex !== activeLyricIndex) {
     activeLyricIndex = newIndex;
     const text = currentLyrics[newIndex].text;
-
+    
     const lineEls = lyricsContainer.querySelectorAll('.lyric-line');
     lineEls.forEach((el, idx) => {
       if (idx === newIndex) {
@@ -1050,7 +982,7 @@ function syncLyrics(currentTime) {
 }
 
 /* =========================================================
-   悬浮歌词
+   可视化悬浮歌词
    ========================================================= */
 let pipWindow = null;
 const inPageFloat = document.getElementById('inPageFloat');
@@ -1069,10 +1001,13 @@ function updateFloatingText(text) {
 
 floatLyricBtn.addEventListener('click', async () => {
   if ('documentPictureInPicture' in window) {
-    if (pipWindow) { pipWindow.close(); return; }
+    if (pipWindow) {
+      pipWindow.close();
+      return;
+    }
     try {
       pipWindow = await window.documentPictureInPicture.requestWindow({ width: 350, height: 120 });
-
+      
       const style = pipWindow.document.createElement('style');
       style.textContent = `
         body { margin: 0; background: rgba(15,23,42,0.95); color: #fff; display: flex; justify-content: center; align-items: center; height: 100vh; font-family: sans-serif; overflow: hidden; }
@@ -1080,16 +1015,16 @@ floatLyricBtn.addEventListener('click', async () => {
       `;
       pipWindow.document.head.appendChild(style);
       pipWindow.document.body.innerHTML = '<div id="pipText">等待歌词...</div>';
-
-      pipWindow.addEventListener('pagehide', () => {
-        pipWindow = null;
-        floatLyricBtn.classList.remove('active');
+      
+      pipWindow.addEventListener('pagehide', () => { 
+        pipWindow = null; 
+        floatLyricBtn.classList.remove('active'); 
       });
-
+      
       floatLyricBtn.classList.add('active');
       if (activeLyricIndex >= 0) updateFloatingText(currentLyrics[activeLyricIndex].text);
-
-    } catch (e) {
+      
+    } catch(e) {
       console.error('画中画开启失败', e);
       alert('无法开启系统画中画，请尝试使用页内悬浮。');
     }
@@ -1146,8 +1081,6 @@ async function fetchSongs() {
 
     if (mp3Files.length === 0) {
       playlistEl.innerHTML = '<li style="padding:20px;text-align:center;color:#94a3b8;">仓库没有 mp3 文件</li>';
-      allSongs = [];
-      renderPlaylist();
       return;
     }
 
@@ -1157,20 +1090,19 @@ async function fetchSongs() {
       return {
         name: fileName.replace(/\.mp3$/i, ''),
         path: file.path,
-        url: baseUrl + encodedPath,
-        sha: file.sha
+        url: baseUrl + encodedPath
       };
     });
 
     applySavedOrder();
     updateTagSelect();
     renderPlaylist();
-
+    
     songTitle.textContent = '准备就绪';
     songArtist.textContent = '点击列表开始播放';
   } catch (error) {
     console.error(error);
-    playlistEl.innerHTML = `<li style="padding:20px;text-align:center;color:#ef4444;">❌ 读取失败: ${escapeHtml(error.message)}</li>`;
+    playlistEl.innerHTML = `<li style="padding:20px;text-align:center;color:#ef4444;">❌ 读取失败: ${error.message}</li>`;
   }
 }
 
@@ -1188,8 +1120,8 @@ function applySavedOrder() {
 
 function updateTagSelect() {
   const currentVal = filterSelect.value;
-  filterSelect.innerHTML = '<option value="">🎵 全部歌曲</option>' +
-    globalTags.map(tag => `<option value="${escapeHtml(tag)}">${escapeHtml(tag)}</option>`).join('');
+  filterSelect.innerHTML = '<option value="">🎵 全部歌曲</option>' + 
+    globalTags.map(tag => `<option value="${tag}">${tag}</option>`).join('');
   if (globalTags.includes(currentVal)) filterSelect.value = currentVal;
 }
 
@@ -1217,25 +1149,33 @@ function renderPlaylist() {
 
   if (displaySongs.length === 0) {
     playlistEl.innerHTML = '<li style="padding:20px;text-align:center;color:#94a3b8;">没有符合条件的歌曲</li>';
+    updateSelectionUI();
     return;
   }
 
   const html = displaySongs.map((song, index) => {
     const isActive = index === currentIndex ? 'active' : '';
     const tags = songTagsMap[song.path] || [];
-    const tagHtml = tags.map(t => `<span class="mini-tag">${escapeHtml(t)}</span>`).join('');
+    const tagHtml = tags.map(t => `<span class="mini-tag">${t}</span>`).join('');
     const cover = getCoverUrl(song.path);
 
+    const isSelected = selectedPaths.has(song.path);
+    const checkHtml = selectionMode ? '<div class="track-check"></div>' : '';
+    const selectableCls = selectionMode ? 'selectable' : '';
+    const selectedCls = isSelected ? 'selected' : '';
+    const draggable = selectionMode ? 'false' : 'true';
+
     return `
-      <li class="track-item ${isActive}" draggable="true" data-index="${index}" data-path="${escapeHtml(song.path)}">
+      <li class="track-item ${isActive} ${selectableCls} ${selectedCls}" draggable="${draggable}" data-index="${index}" data-path="${song.path}">
+        ${checkHtml}
         <img class="track-icon" src="${cover}" loading="lazy" alt="cover">
         <div class="track-info">
-          <div class="track-name">${escapeHtml(song.name)}</div>
-          <div class="track-path">${escapeHtml(song.path)}</div>
+          <div class="track-name">${song.name}</div>
+          <div class="track-path">${song.path}</div>
           <div class="song-tags">${tagHtml}</div>
         </div>
         <div class="playing-indicator"><i></i><i></i><i></i></div>
-        <button class="btn-more" onclick="openMenu(event, '${song.path.replace(/\\/g, '\\\\').replace(/'/g, "\\'")}')">⋮</button>
+        <button class="btn-more" onclick="openMenu(event, '${song.path.replace(/'/g, "\\'")}')">⋮</button>
       </li>
     `;
   }).join('');
@@ -1243,18 +1183,20 @@ function renderPlaylist() {
   playlistEl.innerHTML = html;
 
   bindDragEvents();
-
+  
   if (currentIndex >= 0 && currentIndex < displaySongs.length) {
     setTimeout(() => {
       document.querySelectorAll('.track-item.active').forEach(item => item.scrollIntoView({ behavior: 'smooth', block: 'nearest' }));
     }, 100);
   }
+
+  updateSelectionUI();
 }
 
 /* =========================================================
-   右键菜单
+   菜单与标签
    ========================================================= */
-window.openMenu = function (e, path) {
+window.openMenu = function(e, path) {
   e.stopPropagation();
   activeMenuPath = path;
   const currentTags = songTagsMap[path] || [];
@@ -1264,29 +1206,28 @@ window.openMenu = function (e, path) {
   } else {
     menuTags.innerHTML = globalTags.map(tag => `
       <label class="menu-tag-label">
-        <input type="checkbox" value="${escapeHtml(tag)}" ${currentTags.includes(tag) ? 'checked' : ''}
-               onchange="toggleSongTag('${path.replace(/\\/g, '\\\\').replace(/'/g, "\\'")}', '${tag.replace(/\\/g, '\\\\').replace(/'/g, "\\'")}', this.checked)">
-        ${escapeHtml(tag)}
+        <input type="checkbox" value="${tag}" ${currentTags.includes(tag) ? 'checked' : ''} 
+               onchange="toggleSongTag('${path.replace(/'/g, "\\'")}', '${tag}', this.checked)">
+        ${tag}
       </label>
     `).join('');
   }
 
   const rect = e.target.getBoundingClientRect();
   contextMenu.style.display = 'block';
-
+  
   let top = rect.bottom + 5;
   if (top + contextMenu.offsetHeight > window.innerHeight) top = rect.top - contextMenu.offsetHeight - 5;
   let left = rect.left - 100;
   if (left + contextMenu.offsetWidth > window.innerWidth) left = window.innerWidth - contextMenu.offsetWidth - 10;
-  if (left < 10) left = 10;
 
   contextMenu.style.top = top + 'px';
   contextMenu.style.left = left + 'px';
-};
+}
 
 document.addEventListener('click', () => { contextMenu.style.display = 'none'; });
 
-window.toggleSongTag = function (path, tag, isChecked) {
+window.toggleSongTag = function(path, tag, isChecked) {
   if (!songTagsMap[path]) songTagsMap[path] = [];
   if (isChecked) {
     if (!songTagsMap[path].includes(tag)) songTagsMap[path].push(tag);
@@ -1295,14 +1236,13 @@ window.toggleSongTag = function (path, tag, isChecked) {
   }
   localStorage.setItem('mp_song_tags', JSON.stringify(songTagsMap));
   renderPlaylist();
-};
+}
 
 downloadBtn.addEventListener('click', () => {
   const song = allSongs.find(s => s.path === activeMenuPath);
   if (song) {
     const a = document.createElement('a');
-    a.href = song.url;
-    a.download = song.name + '.mp3';
+    a.href = song.url; a.download = song.name + '.mp3';
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
   }
 });
@@ -1314,7 +1254,8 @@ let draggedItem = null;
 
 function bindDragEvents() {
   document.querySelectorAll('.track-item').forEach(item => {
-    item.addEventListener('dragstart', () => {
+    item.addEventListener('dragstart', (e) => {
+      if (selectionMode) { e.preventDefault(); return; }
       draggedItem = item;
       setTimeout(() => item.classList.add('dragging'), 0);
     });
@@ -1329,8 +1270,11 @@ function bindDragEvents() {
       if (!draggedItem || draggedItem === item) return;
       const rect = item.getBoundingClientRect();
       const offset = e.clientY - rect.top;
-      if (offset > rect.height / 2) item.parentNode.insertBefore(draggedItem, item.nextSibling);
-      else item.parentNode.insertBefore(draggedItem, item);
+      if (offset > rect.height / 2) {
+        item.parentNode.insertBefore(draggedItem, item.nextSibling);
+      } else {
+        item.parentNode.insertBefore(draggedItem, item);
+      }
     });
   });
 }
@@ -1338,7 +1282,7 @@ function bindDragEvents() {
 function saveNewOrder() {
   if (!playlistEl) return;
   const newPaths = Array.from(playlistEl.querySelectorAll('.track-item')).map(li => li.dataset.path);
-
+  
   allSongs.sort((a, b) => {
     const iA = newPaths.indexOf(a.path);
     const iB = newPaths.indexOf(b.path);
@@ -1355,7 +1299,7 @@ function saveNewOrder() {
    ========================================================= */
 function loadSong(index, autoPlay = true) {
   if (index < 0 || index >= displaySongs.length) return;
-
+  
   if (currentIndex === index && audio.src === displaySongs[index].url) {
     if (isPlaying) audio.pause();
     else audio.play();
@@ -1455,15 +1399,27 @@ function handleNextPrev(direction) {
 }
 
 /* =========================================================
-   播放器事件
+   事件监听
    ========================================================= */
 playlistEl.addEventListener('click', (e) => {
   if (e.target.closest('.btn-more')) return;
   const li = e.target.closest('.track-item');
   if (!li) return;
+
+  // ---- 批量选择模式：点击即勾选，不播放 ----
+  if (selectionMode) {
+    const path = li.dataset.path;
+    if (selectedPaths.has(path)) selectedPaths.delete(path);
+    else selectedPaths.add(path);
+    li.classList.toggle('selected');
+    updateSelectionUI();
+    return;
+  }
+
   const index = parseInt(li.dataset.index);
   loadSong(index);
-
+  
+  // 移动端选中歌曲后自动返回播放页
   if (window.innerWidth <= 768) {
     mainContainer.classList.remove('show-list');
   }
@@ -1553,439 +1509,184 @@ function fmtTime(sec) {
 }
 
 /* =========================================================
-   ★★★ 设置页逻辑 ★★★
+   设置面板 / 批量选择 / 批量缓存 / 批量标签
    ========================================================= */
-const settingsPage = document.getElementById('settingsPage');
-const settingsBtn = document.getElementById('settingsBtn');
-const settingsBackBtn = document.getElementById('settingsBackBtn');
-const settingsTitle = document.getElementById('settingsTitle');
 
-const VIEW_TITLES = {
-  Menu: '设置',
-  Upload: '上传曲目',
-  Delete: '删除曲目',
-  Cache: '缓存曲目',
-  Tags: '批量标签'
-};
-const VIEW_KEYS = ['Menu', 'Upload', 'Delete', 'Cache', 'Tags'];
-let currentView = 'Menu';
+/* ---------------- 设置面板开关 ---------------- */
+settingsBtn.addEventListener('click', () => settingsPanel.classList.add('open'));
+settingsCloseBtn.addEventListener('click', () => settingsPanel.classList.remove('open'));
+cancelSelectionBtn.addEventListener('click', exitSelectionMode);
 
-const selectState = { del: new Set(), cache: new Set(), tag: new Set() };
-
-settingsBtn.addEventListener('click', () => {
-  contextMenu.style.display = 'none';
-  settingsPage.classList.add('open');
-  showView('Menu');
-});
-
-settingsBackBtn.addEventListener('click', () => {
-  if (currentView !== 'Menu') showView('Menu');
-  else settingsPage.classList.remove('open');
-});
-
-document.querySelectorAll('.setting-item[data-view]').forEach(item => {
-  item.addEventListener('click', () => showView(item.dataset.view));
-});
-
-function showView(name) {
-  currentView = name;
-  VIEW_KEYS.forEach(v => {
-    document.getElementById('view' + v).classList.toggle('hide', v !== name);
-  });
-  settingsTitle.textContent = VIEW_TITLES[name];
-  document.getElementById('settingsBody').scrollTop = 0;
-
-  if (name === 'Delete') renderSelList('del');
-  else if (name === 'Cache') renderSelList('cache');
-  else if (name === 'Tags') { refreshTagPickSelect(); renderSelList('tag'); }
-}
-
-/* ---------- 通用多选列表 ---------- */
-const BTN_MAP = { del: 'doDeleteBtn', cache: 'doCacheBtn' };
-
-function renderSelList(prefix) {
-  const ul = document.getElementById(prefix + 'List');
-  const set = selectState[prefix];
-
-  // 清理已经不存在的路径
-  Array.from(set).forEach(p => {
-    if (!allSongs.some(s => s.path === p)) set.delete(p);
-  });
-
-  if (allSongs.length === 0) {
-    ul.innerHTML = '<li style="padding:18px;text-align:center;color:#94a3b8;font-size:13px;">暂无可操作的曲目</li>';
-    updateSelCount(prefix);
-    return;
-  }
-
-  ul.innerHTML = allSongs.map(song => `
-    <li class="sel-item" data-path="${escapeHtml(song.path)}">
-      <input type="checkbox" ${set.has(song.path) ? 'checked' : ''}>
-      <div class="sel-info">
-        <div class="sel-name">${escapeHtml(song.name)}</div>
-        <div class="sel-path">${escapeHtml(song.path)}</div>
-      </div>
-    </li>
-  `).join('');
-
-  ul.querySelectorAll('.sel-item').forEach(li => {
-    li.addEventListener('click', (e) => {
-      const path = li.dataset.path;
-      const cb = li.querySelector('input');
-      if (e.target !== cb) cb.checked = !cb.checked;
-      if (cb.checked) set.add(path);
-      else set.delete(path);
-      updateSelCount(prefix);
-    });
-  });
-
-  updateSelCount(prefix);
-}
-
-function updateSelCount(prefix) {
-  const n = selectState[prefix].size;
-  const countEl = document.getElementById(prefix + 'Count');
-  if (countEl) countEl.textContent = `已选 ${n} 首`;
-
-  const allEl = document.getElementById(prefix + 'SelectAll');
-  if (allEl) {
-    allEl.checked = n > 0 && n === allSongs.length;
-    allEl.indeterminate = n > 0 && n < allSongs.length;
-  }
-
-  const btnId = BTN_MAP[prefix];
-  if (btnId) {
-    const btn = document.getElementById(btnId);
-    btn.disabled = n === 0;
-    if (prefix === 'del') btn.textContent = n ? `删除所选曲目（${n}）` : '删除所选曲目';
-    if (prefix === 'cache') btn.textContent = n ? `缓存所选曲目（${n}）` : '缓存所选曲目';
-  }
-}
-
-['del', 'cache', 'tag'].forEach(prefix => {
-  const allEl = document.getElementById(prefix + 'SelectAll');
-  allEl.addEventListener('change', () => {
-    if (allEl.checked) allSongs.forEach(s => selectState[prefix].add(s.path));
-    else selectState[prefix].clear();
-    renderSelList(prefix);
-  });
-});
-
-function logLine(el, text, type = 'info') {
-  const div = document.createElement('div');
-  div.className = 'log-' + type;
-  div.textContent = text;
-  el.appendChild(div);
-  el.scrollTop = el.scrollHeight;
-}
-
-/* ---------- 1. 上传曲目 ---------- */
-let pendingFiles = [];
-
-const fileDrop = document.getElementById('fileDrop');
-const fileInput = document.getElementById('fileInput');
-
-fileDrop.addEventListener('click', () => fileInput.click());
-fileDrop.addEventListener('dragover', (e) => { e.preventDefault(); fileDrop.classList.add('dragover'); });
-fileDrop.addEventListener('dragleave', () => fileDrop.classList.remove('dragover'));
-fileDrop.addEventListener('drop', (e) => {
-  e.preventDefault();
-  fileDrop.classList.remove('dragover');
-  addPendingFiles(e.dataTransfer.files);
-});
-fileInput.addEventListener('change', () => {
-  addPendingFiles(fileInput.files);
-  fileInput.value = '';
-});
-
-function addPendingFiles(fileList) {
-  const files = Array.from(fileList).filter(f => /\.mp3$/i.test(f.name));
-  if (files.length === 0) {
-    alert('请选择 .mp3 文件');
-    return;
-  }
-  files.forEach(f => {
-    if (!pendingFiles.some(x => x.name === f.name && x.size === f.size)) pendingFiles.push(f);
-  });
-  renderPendingFiles();
-}
-
-function renderPendingFiles() {
-  const ul = document.getElementById('uploadFileList');
-  ul.innerHTML = pendingFiles.map((f, i) => `
-    <li class="sel-item" style="cursor:default;">
-      <div class="sel-info">
-        <div class="sel-name">${escapeHtml(f.name)}</div>
-        <div class="sel-path">${(f.size / 1024 / 1024).toFixed(2)} MB</div>
-      </div>
-      <button class="btn-more" data-idx="${i}" title="移除">✕</button>
-    </li>
-  `).join('');
-
-  ul.querySelectorAll('button[data-idx]').forEach(b => {
-    b.addEventListener('click', () => {
-      pendingFiles.splice(parseInt(b.dataset.idx), 1);
-      renderPendingFiles();
-    });
-  });
-
-  const btn = document.getElementById('doUploadBtn');
-  btn.disabled = pendingFiles.length === 0;
-  btn.textContent = pendingFiles.length ? `开始上传（${pendingFiles.length} 个文件）` : '开始上传';
-}
-
-document.getElementById('doUploadBtn').addEventListener('click', async () => {
-  if (pendingFiles.length === 0) return;
-
-  // 如果没有 Token，或者 Token 失效了，弹窗让用户输入
-  if (!getGitHubToken()) {
-    alert('必须提供 Token 才能上传！');
-    return;
-  }
-
-  const dir = document.getElementById('uploadDir').value.trim();
-  const btn = document.getElementById('doUploadBtn');
-  const log = document.getElementById('uploadLog');
-
-  btn.disabled = true;
-  log.classList.add('show');
-  log.innerHTML = '';
-  logLine(log, `准备上传 ${pendingFiles.length} 个文件 → ${dir || '仓库根目录'}`, 'info');
-
-  let ok = 0, fail = 0;
-  const uploaded = [];
-
-  for (const file of pendingFiles) {
-    logLine(log, `正在上传：${file.name} ...`, 'info');
-    try {
-      const path = await ghUpload(file, dir);
-      uploaded.push({ file, path });
-      ok++;
-      logLine(log, `✔ 已上传：${path}`, 'ok');
-    } catch (err) {
-      fail++;
-      logLine(log, `✘ 失败：${file.name}（${err.message}）`, 'err');
-      if (err.message.includes('401') || err.message.includes('Bad credentials')) {
-        logLine(log, `⚠️ Token 无效或已过期，请重新点击上传并输入新 Token`, 'err');
-        btn.disabled = false;
-        return;
-      }
+document.querySelectorAll('.setting-item').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const action = btn.dataset.action;
+    if (action === 'upload') {
+      window.open(`https://github.com/${CONFIG.owner}/${CONFIG.repo}/upload/${CONFIG.branch}`, '_blank');
+    } else if (action === 'delete') {
+      window.open(`https://github.com/${CONFIG.owner}/${CONFIG.repo}`, '_blank');
+    } else if (action === 'cache') {
+      enterSelectionMode('cache');
+    } else if (action === 'tag') {
+      enterSelectionMode('tag');
     }
-  }
-
-  // 本地补进列表（无需重新请求）
-  const baseUrl = `https://${CONFIG.owner}.github.io/${CONFIG.repo}/`;
-  uploaded.forEach(({ path }) => {
-    if (allSongs.some(s => s.path === path)) return;
-    allSongs.push({
-      name: path.split('/').pop().replace(/\.mp3$/i, ''),
-      path,
-      url: baseUrl + path.split('/').map(encodeURIComponent).join('/'),
-      sha: null
-    });
   });
+});
 
-  localStorage.setItem('mp_song_order', JSON.stringify(allSongs.map(s => s.path)));
-  updateTagSelect();
+/* ---------------- 进入 / 退出批量选择模式 ---------------- */
+function enterSelectionMode(mode) {
+  selectionMode = mode;
+  selectedPaths.clear();
+  settingsPanel.classList.remove('open');
+  listPage.classList.add('selection-mode');
+  renderBatchBar();
   renderPlaylist();
+  playlistEl.scrollTop = 0;
+}
 
-  logLine(log, `—— 完成：成功 ${ok}，失败 ${fail} ——`, ok > 0 ? 'ok' : 'err');
-  if (ok > 0) logLine(log, '提示：GitHub Pages 需要 1~2 分钟部署，新歌才会可播放。', 'info');
+function exitSelectionMode() {
+  selectionMode = null;
+  selectedPaths.clear();
+  listPage.classList.remove('selection-mode');
+  batchBar.classList.remove('show');
+  batchActions.innerHTML = '';
+  renderPlaylist();
+}
 
-  pendingFiles = [];
-  renderPendingFiles();
-  btn.disabled = pendingFiles.length === 0;
-});
-
-/* ---------- 2. 删除曲目 ---------- */
-document.getElementById('doDeleteBtn').addEventListener('click', async () => {
-  const paths = Array.from(selectState.del);
-  if (paths.length === 0) return;
-
-  if (!confirm(`确定删除选中的 ${paths.length} 首歌曲吗？\n\n⚠️ 这会同时删除 GitHub 仓库中的音频文件，不可恢复！`)) return;
-
-  if (!getGitHubToken()) {
-    alert('必须提供 Token 才能删除！');
+/* ---------------- 底部批量操作栏 ---------------- */
+function renderBatchBar() {
+  if (!selectionMode) {
+    batchBar.classList.remove('show');
+    batchActions.innerHTML = '';
     return;
   }
+  batchBar.classList.add('show');
 
-  const btn = document.getElementById('doDeleteBtn');
-  const log = document.getElementById('deleteLog');
-  btn.disabled = true;
-  log.classList.add('show');
-  log.innerHTML = '';
+  if (selectionMode === 'cache') {
+    batchActions.innerHTML = `
+      <button class="batch-btn" id="doCacheBtn" disabled>⬇ 缓存选中</button>
+      <button class="batch-btn ghost" id="cancelBatchBtn">取消</button>
+    `;
+    document.getElementById('doCacheBtn').addEventListener('click', doCacheSelected);
+    document.getElementById('cancelBatchBtn').addEventListener('click', exitSelectionMode);
 
-  let ok = 0, fail = 0;
-
-  for (const path of paths) {
-    const song = allSongs.find(s => s.path === path);
-    logLine(log, `正在删除：${path} ...`, 'info');
-    try {
-      let sha = song && song.sha;
-      if (!sha) sha = await ghGetSha(path);
-      await ghDelete(path, sha);
-
-      allSongs = allSongs.filter(s => s.path !== path);
-      delete songTagsMap[path];
-      ok++;
-      logLine(log, `✔ 已删除：${path}`, 'ok');
-    } catch (err) {
-      fail++;
-      logLine(log, `✘ 失败：${path}（${err.message}）`, 'err');
-      if (err.message.includes('401') || err.message.includes('Bad credentials')) {
-        logLine(log, `⚠️ Token 无效或已过期，请重新点击删除并输入新 Token`, 'err');
-        btn.disabled = false;
-        return;
-      }
+  } else {
+    // 批量标签模式
+    if (globalTags.length === 0) {
+      batchActions.innerHTML = `
+        <input type="text" class="batch-select" id="batchNewTagInput" placeholder="输入新标签名...">
+        <button class="batch-btn" id="batchCreateTagBtn">创建标签</button>
+        <button class="batch-btn ghost" id="cancelBatchBtn2">取消</button>
+      `;
+      document.getElementById('batchCreateTagBtn').addEventListener('click', () => {
+        const val = document.getElementById('batchNewTagInput').value.trim();
+        if (!val) return;
+        if (!globalTags.includes(val)) {
+          globalTags.push(val);
+          localStorage.setItem('mp_tags_pool', JSON.stringify(globalTags));
+          updateTagSelect();
+        }
+        renderBatchBar();
+      });
+      document.getElementById('cancelBatchBtn2').addEventListener('click', exitSelectionMode);
+    } else {
+      const opts = globalTags.map(t => `<option value="${t}">${t}</option>`).join('');
+      batchActions.innerHTML = `
+        <select class="batch-select" id="batchTagSelect">
+          <option value="">选择标签</option>${opts}
+        </select>
+        <button class="batch-btn" id="batchAddBtn" disabled>添加</button>
+        <button class="batch-btn ghost" id="batchRemoveBtn" disabled>移除</button>
+        <button class="batch-btn ghost" id="cancelBatchBtn2">取消</button>
+      `;
+      document.getElementById('batchAddBtn').addEventListener('click', () => applyBatchTag(false));
+      document.getElementById('batchRemoveBtn').addEventListener('click', () => applyBatchTag(true));
+      document.getElementById('cancelBatchBtn2').addEventListener('click', exitSelectionMode);
     }
   }
+
+  updateSelectionUI();
+}
+
+/* ---------------- 刷新选中数量 & 按钮状态 ---------------- */
+function updateSelectionUI() {
+  if (selectionCount) selectionCount.textContent = `已选 ${selectedPaths.size} 首`;
+  const n = selectedPaths.size;
+
+  const ids = ['doCacheBtn', 'batchAddBtn', 'batchRemoveBtn'];
+  ids.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.disabled = n === 0;
+  });
+}
+
+/* ---------------- 批量标签：应用 ---------------- */
+function applyBatchTag(isRemove) {
+  const sel = document.getElementById('batchTagSelect');
+  const tag = sel ? sel.value : '';
+  if (!tag) { alert('请先选择一个标签'); return; }
+  if (selectedPaths.size === 0) { alert('请先勾选歌曲'); return; }
+
+  selectedPaths.forEach(path => {
+    if (!songTagsMap[path]) songTagsMap[path] = [];
+    if (isRemove) {
+      songTagsMap[path] = songTagsMap[path].filter(t => t !== tag);
+    } else {
+      if (!songTagsMap[path].includes(tag)) songTagsMap[path].push(tag);
+    }
+  });
 
   localStorage.setItem('mp_song_tags', JSON.stringify(songTagsMap));
-  localStorage.setItem('mp_song_order', JSON.stringify(allSongs.map(s => s.path)));
-
-  logLine(log, `—— 完成：成功 ${ok}，失败 ${fail} ——`, ok > 0 ? 'ok' : 'err');
-
-  selectState.del.clear();
-  renderSelList('del');
-  updateTagSelect();
   renderPlaylist();
-  btn.disabled = true;
-});
+}
 
-/* ---------- 3. 缓存曲目 ---------- */
-document.getElementById('doCacheBtn').addEventListener('click', async () => {
-  const paths = Array.from(selectState.cache);
-  if (paths.length === 0) return;
+/* ---------------- 批量缓存：下载到本地 ---------------- */
+async function doCacheSelected() {
+  if (selectedPaths.size === 0) { alert('请先勾选歌曲'); return; }
 
+  const paths = [...selectedPaths];
   const btn = document.getElementById('doCacheBtn');
-  const log = document.getElementById('cacheLog');
-  btn.disabled = true;
-  log.classList.add('show');
-  log.innerHTML = '';
-  logLine(log, `开始缓存 ${paths.length} 首歌曲...`, 'info');
+  if (btn) { btn.disabled = true; }
 
   let ok = 0, fail = 0;
 
-  for (const path of paths) {
-    const song = allSongs.find(s => s.path === path);
-    if (!song) continue;
-    logLine(log, `正在下载：${song.name} ...`, 'info');
+  for (let i = 0; i < paths.length; i++) {
+    const song = allSongs.find(s => s.path === paths[i]);
+    if (!song) { fail++; continue; }
+
+    if (btn) btn.textContent = `缓存中 ${i + 1}/${paths.length}`;
+
     try {
-      await downloadSongFile(song);
+      const res = await fetch(song.url);
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const blob = await res.blob();
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = song.name + '.mp3';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 60000);
+
       ok++;
-      logLine(log, `✔ 已下载：${song.name}`, 'ok');
-      await new Promise(r => setTimeout(r, 400)); // 防止浏览器拦截连续下载
+      // 间隔，避免浏览器把连续下载判定为弹窗拦截
+      await new Promise(r => setTimeout(r, 400));
     } catch (err) {
+      console.warn('缓存失败:', song.path, err);
       fail++;
-      logLine(log, `✘ 失败：${song.name}（${err.message}）`, 'err');
     }
   }
 
-  logLine(log, `—— 完成：成功 ${ok}，失败 ${fail} ——`, ok > 0 ? 'ok' : 'err');
-  btn.disabled = selectState.cache.size === 0;
-});
+  if (btn) { btn.disabled = false; btn.textContent = '⬇ 缓存选中'; }
 
-async function downloadSongFile(song) {
-  const fileName = song.name + '.mp3';
-  try {
-    const res = await fetch(song.url, { cache: 'force-cache' });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const blob = await res.blob();
-    const blobUrl = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = blobUrl;
-    a.download = fileName;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    setTimeout(() => URL.revokeObjectURL(blobUrl), 60000);
-  } catch (e) {
-    const a = document.createElement('a');
-    a.href = song.url;
-    a.download = fileName;
-    a.target = '_blank';
-    a.rel = 'noopener';
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-  }
+  alert(fail === 0
+    ? `✅ 缓存完成，共 ${ok} 首歌曲已下载到本地`
+    : `缓存完成：成功 ${ok} 首，失败 ${fail} 首`);
 }
 
-/* ---------- 4. 批量标签 ---------- */
-function refreshTagPickSelect() {
-  const sel = document.getElementById('tagPickSelect');
-  if (globalTags.length === 0) {
-    sel.innerHTML = '<option value="">（暂无已有标签）</option>';
-    return;
-  }
-  sel.innerHTML = globalTags.map(t => `<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join('');
-}
-
-function getPickedTag() {
-  const inputVal = document.getElementById('tagPickInput').value.trim();
-  if (inputVal) return inputVal;
-  return document.getElementById('tagPickSelect').value || '';
-}
-
-document.getElementById('applyTagBtn').addEventListener('click', () => {
-  const tag = getPickedTag();
-  const log = document.getElementById('tagLog');
-
-  if (!tag) { alert('请先选择或输入一个标签'); return; }
-  const paths = Array.from(selectState.tag);
-  if (paths.length === 0) { alert('请先勾选要操作的曲目'); return; }
-
-  if (!globalTags.includes(tag)) {
-    globalTags.push(tag);
-    localStorage.setItem('mp_tags_pool', JSON.stringify(globalTags));
-    updateTagSelect();
-    refreshTagPickSelect();
-  }
-
-  paths.forEach(p => {
-    if (!songTagsMap[p]) songTagsMap[p] = [];
-    if (!songTagsMap[p].includes(tag)) songTagsMap[p].push(tag);
-  });
-  localStorage.setItem('mp_song_tags', JSON.stringify(songTagsMap));
-
-  renderPlaylist();
-  renderSelList('tag');
-
-  log.classList.add('show');
-  log.innerHTML = '';
-  logLine(log, `✔ 已为 ${paths.length} 首歌曲添加标签「${tag}」`, 'ok');
-});
-
-document.getElementById('removeTagBtn').addEventListener('click', () => {
-  const tag = getPickedTag();
-  const log = document.getElementById('tagLog');
-
-  if (!tag) { alert('请先选择或输入一个标签'); return; }
-  const paths = Array.from(selectState.tag);
-  if (paths.length === 0) { alert('请先勾选要操作的曲目'); return; }
-
-  let count = 0;
-  paths.forEach(p => {
-    if (songTagsMap[p] && songTagsMap[p].includes(tag)) {
-      songTagsMap[p] = songTagsMap[p].filter(t => t !== tag);
-      count++;
-    }
-  });
-  localStorage.setItem('mp_song_tags', JSON.stringify(songTagsMap));
-
-  renderPlaylist();
-  renderSelList('tag');
-
-  log.classList.add('show');
-  log.innerHTML = '';
-  logLine(log, `✔ 已从 ${count} 首歌曲移除标签「${tag}」`, 'ok');
-});
-
-/* =========================================================
-   初始化
-   ========================================================= */
+// 初始化
 updateTagSelect();
-refreshTagPickSelect();
 fetchSongs();
 </script>
 </body>
