@@ -87,6 +87,12 @@
     background: rgba(255,255,255,0.05);
   }
   .nav-icon:hover { background: rgba(255,255,255,0.15); opacity: 1; }
+
+  .nav-tools {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
   .url-btn {
     background: rgba(255,255,255,0.1);
     border: 1px solid rgba(255,255,255,0.15);
@@ -96,6 +102,10 @@
     text-decoration: none;
     font-size: 13px;
     transition: all 0.2s;
+    cursor: pointer;
+    font-family: inherit;
+    line-height: 1;
+    white-space: nowrap;
   }
   .url-btn:hover { background: rgba(255,255,255,0.2); }
 
@@ -598,6 +608,39 @@
     .batch-btn { min-width: 78px; padding: 10px 10px; font-size: 12.5px; }
     .batch-select { min-width: 90px; font-size: 12.5px; padding: 10px 8px; }
   }
+
+  /* ================= 工具下拉菜单 (转换器 / search) ================= */
+  .tool-menu {
+    position: fixed;
+    background: #1e293b;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    padding: 6px;
+    min-width: 200px;
+    z-index: 1001;
+    display: none;
+  }
+  .tool-menu.show { display: block; }
+  .tool-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 13.5px;
+    color: #e2e8f0;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.15s;
+    white-space: nowrap;
+  }
+  .tool-menu-item:hover { background: rgba(255,255,255,0.1); }
+  .tool-menu-divider {
+    height: 1px;
+    background: rgba(255,255,255,0.08);
+    margin: 4px 6px;
+  }
 </style>
 </head>
 <body>
@@ -611,7 +654,10 @@
       <div class="nav-icon" id="mobileListBtn" title="播放列表">
         <svg viewBox="0 0 24 24" style="width:20px; height:20px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round;"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
       </div>
-      <a href="https://y2mate.gs/" target="_blank" class="url-btn">🔗 转换器</a>
+      <div class="nav-tools">
+        <button class="url-btn" id="converterBtn">转换器</button>
+        <button class="url-btn" id="searchBtn">search</button>
+      </div>
       <div class="nav-icon" style="opacity:0;">⋮</div>
     </div>
 
@@ -776,6 +822,22 @@
 </div>
 
 <audio id="audio" preload="metadata"></audio>
+
+<!-- 转换器菜单 -->
+<div class="tool-menu" id="converterMenu">
+  <a class="tool-menu-item" href="https://y2mate.gs/" target="_blank" rel="noopener">y2mate 在线转换</a>
+  <div class="tool-menu-divider"></div>
+  <a class="tool-menu-item" href="https://screenapp.io/zh/features/audio-upload" target="_blank" rel="noopener">ScreenApp 音频上传</a>
+  <div class="tool-menu-divider"></div>
+  <a class="tool-menu-item" href="https://pages.edgeone.ai/zh/use-cases/mp3-to-url" target="_blank" rel="noopener">EdgeOne MP3 转链接</a>
+</div>
+
+<!-- 搜索菜单 -->
+<div class="tool-menu" id="searchMenu">
+  <a class="tool-menu-item" id="youtubeOption" href="https://www.youtube.com" target="_blank" rel="noopener">YouTube</a>
+  <div class="tool-menu-divider"></div>
+  <a class="tool-menu-item" href="https://fanyday102.github.io/soundsudio/search.html" target="_blank" rel="noopener">站内搜索 search.html</a>
+</div>
 
 <script>
 /* =========================================================
@@ -1684,6 +1746,109 @@ async function doCacheSelected() {
     ? `✅ 缓存完成，共 ${ok} 首歌曲已下载到本地`
     : `缓存完成：成功 ${ok} 首，失败 ${fail} 首`);
 }
+
+/* =========================================================
+   工具下拉菜单（转换器 / search）
+   ========================================================= */
+const converterBtn = document.getElementById('converterBtn');
+const searchBtn = document.getElementById('searchBtn');
+const converterMenu = document.getElementById('converterMenu');
+const searchMenu = document.getElementById('searchMenu');
+const youtubeOption = document.getElementById('youtubeOption');
+
+function showToolMenu(menuEl, btnEl) {
+  // 先关闭所有菜单
+  document.querySelectorAll('.tool-menu').forEach(m => m.classList.remove('show'));
+
+  menuEl.classList.add('show');
+
+  // 先隐藏测量宽度
+  menuEl.style.visibility = 'hidden';
+  menuEl.style.left = '0px';
+  menuEl.style.top = '0px';
+  const mw = menuEl.offsetWidth;
+
+  const rect = btnEl.getBoundingClientRect();
+  const padding = 8;
+
+  let left = rect.left + rect.width / 2 - mw / 2;
+  if (left < padding) left = padding;
+  if (left + mw > window.innerWidth - padding) left = window.innerWidth - mw - padding;
+
+  menuEl.style.left = left + 'px';
+  menuEl.style.top = (rect.bottom + 6) + 'px';
+  menuEl.style.visibility = 'visible';
+}
+
+converterBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  if (converterMenu.classList.contains('show')) {
+    converterMenu.classList.remove('show');
+  } else {
+    showToolMenu(converterMenu, converterBtn);
+  }
+});
+
+searchBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  if (searchMenu.classList.contains('show')) {
+    searchMenu.classList.remove('show');
+  } else {
+    showToolMenu(searchMenu, searchBtn);
+  }
+});
+
+// 点击菜单项后隐藏菜单（a 标签会自己跳转）
+document.querySelectorAll('.tool-menu .tool-menu-item').forEach(item => {
+  item.addEventListener('click', () => {
+    document.querySelectorAll('.tool-menu').forEach(m => m.classList.remove('show'));
+  });
+});
+
+// 点击空白处关闭菜单
+document.addEventListener('click', (e) => {
+  if (e.target.closest('.tool-menu') || e.target.closest('#converterBtn') || e.target.closest('#searchBtn')) return;
+  document.querySelectorAll('.tool-menu').forEach(m => m.classList.remove('show'));
+});
+
+// 窗口尺寸变化时关闭（避免错位）
+window.addEventListener('resize', () => {
+  document.querySelectorAll('.tool-menu').forEach(m => m.classList.remove('show'));
+});
+
+/* ------- YouTube 智能跳转：有 App 跳 App，否则打开网页 ------- */
+youtubeOption.addEventListener('click', (e) => {
+  const ua = navigator.userAgent;
+  const isAndroid = /Android/i.test(ua);
+  const isIOS = /iPhone|iPad|iPod/i.test(ua);
+
+  // 桌面端：让 <a> 默认行为打开 youtube.com
+  if (!isAndroid && !isIOS) return;
+
+  e.preventDefault();
+  const webUrl = 'https://www.youtube.com';
+
+  if (isAndroid) {
+    // Android intent scheme，自带 fallback_url 未安装 App 会自动打开网页
+    window.location.href = 'intent://www.youtube.com#Intent;package=com.google.android.youtube;scheme=https;S.browser_fallback_url=' +
+      encodeURIComponent(webUrl) + ';end';
+  } else {
+    // iOS: 尝试 youtube:// scheme，失败兜底打开网页
+    const start = Date.now();
+    let switched = false;
+    const onVis = () => { if (document.hidden) switched = true; };
+    document.addEventListener('visibilitychange', onVis);
+
+    window.location.href = 'youtube://www.youtube.com';
+
+    setTimeout(() => {
+      document.removeEventListener('visibilitychange', onVis);
+      if (!switched && !document.hidden && Date.now() - start < 3000) {
+        window.open(webUrl, '_blank');
+      }
+    }, 1200);
+  }
+});
 
 // 初始化
 updateTagSelect();
