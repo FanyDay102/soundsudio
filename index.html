@@ -752,7 +752,7 @@
       </div>
       <div class="tag-manager">
         <select class="tag-select" id="filterSelect">
-          <option value="">🎵 全部歌曲</option>
+          <option value="">全部歌曲</option>
         </select>
         <input type="text" class="song-search-input" id="songSearchInput" placeholder="🔍 搜索歌名..." autocomplete="off">
         <div class="tag-input-wrap">
@@ -1205,7 +1205,7 @@ function updateTagSelect() {
   const currentVal = filterSelect.value;
   filterSelect.innerHTML =
     '<option value="">🎵 全部歌曲</option>' +
-    '<option value="__untagged__">🏷️ 未分类</option>' +
+    '<option value="__untagged__">Uncategorized未分类</option>' +
     globalTags.map(tag => `<option value="${tag}">${tag}</option>`).join('');
 
   // 保持原有选择：空值、未分类、或仍存在的标签
