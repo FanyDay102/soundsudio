@@ -1204,7 +1204,7 @@ function applySavedOrder() {
 function updateTagSelect() {
   const currentVal = filterSelect.value;
   filterSelect.innerHTML =
-    '<option value="">🎵 全部歌曲</option>' +
+    '<option value="">全部歌曲</option>' +
     '<option value="__untagged__">Uncategorized未分类</option>' +
     globalTags.map(tag => `<option value="${tag}">${tag}</option>`).join('');
 
