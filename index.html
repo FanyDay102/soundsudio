@@ -343,6 +343,19 @@
   .float-close:hover { color: #fff; }
   .float-text { pointer-events: none; padding: 10px; text-shadow: 0 2px 5px rgba(0,0,0,0.8); }
 
+  /* ================= 设置相关 ================= */
+  #settingsBtn { color: var(--text-sub); margin-left: auto; }
+  #settingsBtn:hover { color: #fff; background: rgba(255,255,255,0.1); }
+  .settings-action:hover { background: rgba(255,255,255,0.1) !important; }
+  #settingsPanel::-webkit-scrollbar { width: 4px; }
+  #settingsPanel::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 2px; }
+  .batch-check {
+    width: 18px; height: 18px; accent-color: var(--primary);
+    flex-shrink: 0; cursor: pointer; margin-right: 2px;
+  }
+  .track-item.batch-mode { cursor: pointer; }
+  .track-item.batch-mode:hover { background: rgba(239,68,68,0.08); }
+
   /* ================= 移动端适配 (全屏切换) ================= */
   @media (max-width: 768px) {
     body { padding: 0; align-items: flex-start; }
@@ -488,11 +501,25 @@
   <section class="list-page">
     <div class="list-header">
       <div class="header-top">
-        <!-- 移动端返回按钮 -->
         <div class="mobile-back-btn" id="backToPlayerBtn">
           <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
         </div>
         <h2>播放列表 <span id="songCount">(0)</span></h2>
+        <button class="btn-icon" id="settingsBtn" title="设置">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none"
+               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06
+                     a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09
+                     A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83
+                     l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09
+                     A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83
+                     l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09
+                     a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83
+                     l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09
+                     a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+        </button>
       </div>
       <div class="tag-manager">
         <select class="tag-select" id="filterSelect">
@@ -524,6 +551,86 @@
   <div class="float-text" id="floatText">等待播放...</div>
 </div>
 
+<!-- ================= 设置遮罩 & 面板 ================= -->
+<div id="settingsOverlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:800;"></div>
+<div id="settingsPanel" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+     width:min(94vw, 520px); max-height:85vh; overflow-y:auto; background:#1e293b; border:1px solid rgba(255,255,255,0.1);
+     border-radius:16px; z-index:801; padding:24px; box-shadow:0 20px 60px rgba(0,0,0,0.6);">
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+    <h3 style="font-size:18px;">⚙️ 设置</h3>
+    <button id="closeSettingsBtn" style="background:none; border:none; color:#94a3b8; font-size:20px; cursor:pointer;">✕</button>
+  </div>
+
+  <!-- PAT 输入 -->
+  <div style="margin-bottom:20px; padding:14px; background:rgba(0,0,0,0.25); border-radius:10px;">
+    <label style="font-size:12px; color:#94a3b8; display:block; margin-bottom:6px;">
+      GitHub Token（上传/删除需要，仅存于本标签页，关闭即清除）
+    </label>
+    <input type="password" id="patInput" placeholder="github_pat_..."
+           style="width:100%; padding:8px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.15);
+                  background:rgba(0,0,0,0.3); color:#fff; font-size:13px; box-sizing:border-box;">
+    <div style="font-size:11px; color:#64748b; margin-top:6px;">
+      需 Fine-grained PAT，权限仅勾选 <b>Contents: Read and write</b>
+    </div>
+  </div>
+
+  <div style="display:grid; gap:10px;">
+    <button class="settings-action" data-action="upload"
+            style="padding:14px; border-radius:10px; border:1px solid rgba(255,255,255,0.1);
+                   background:rgba(255,255,255,0.05); color:#fff; text-align:left; cursor:pointer; font-size:14px;">
+      📤 上传曲目 <span style="font-size:11px; color:#94a3b8; display:block; margin-top:2px;">选择 MP3 直接提交到 GitHub 仓库</span>
+    </button>
+    <button class="settings-action" data-action="delete"
+            style="padding:14px; border-radius:10px; border:1px solid rgba(255,255,255,0.1);
+                   background:rgba(255,255,255,0.05); color:#fff; text-align:left; cursor:pointer; font-size:14px;">
+      🗑️ 删除曲目 <span style="font-size:11px; color:#94a3b8; display:block; margin-top:2px;">批量勾选，删除 GitHub 仓库中的音频文件</span>
+    </button>
+    <button class="settings-action" data-action="cache"
+            style="padding:14px; border-radius:10px; border:1px solid rgba(255,255,255,0.1);
+                   background:rgba(255,255,255,0.05); color:#fff; text-align:left; cursor:pointer; font-size:14px;">
+      💾 缓存曲目 <span style="font-size:11px; color:#94a3b8; display:block; margin-top:2px;">批量勾选，缓存到浏览器本地（可离线播放）</span>
+    </button>
+    <button class="settings-action" data-action="batchTag"
+            style="padding:14px; border-radius:10px; border:1px solid rgba(255,255,255,0.1);
+                   background:rgba(255,255,255,0.05); color:#fff; text-align:left; cursor:pointer; font-size:14px;">
+      🏷️ 批量标签 <span style="font-size:11px; color:#94a3b8; display:block; margin-top:2px;">批量增删歌曲标签</span>
+    </button>
+  </div>
+
+  <!-- 上传面板 -->
+  <div id="uploadPanel" style="display:none; margin-top:20px; padding:16px; background:rgba(0,0,0,0.2); border-radius:10px;">
+    <input type="file" id="mp3FileInput" accept=".mp3,audio/mpeg" multiple
+           style="color:#fff; font-size:13px;">
+    <div id="uploadStatus" style="font-size:12px; color:#94a3b8; margin-top:8px;"></div>
+  </div>
+
+  <!-- 批量操作工具栏 -->
+  <div id="batchToolbar" style="display:none; margin-top:16px; padding:12px;
+       background:rgba(239,68,68,0.1); border-radius:10px; border:1px solid rgba(239,68,68,0.3);">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+      <span id="batchCount" style="font-size:13px; color:#fca5a5;">已选 0 首</span>
+      <button id="executeBatchBtn" style="padding:8px 16px; border-radius:8px; border:none;
+              background:#ef4444; color:#fff; font-size:13px; cursor:pointer;">执行</button>
+    </div>
+    <div id="batchStatus" style="font-size:12px; color:#94a3b8;"></div>
+  </div>
+
+  <!-- 批量标签面板 -->
+  <div id="batchTagPanel" style="display:none; margin-top:16px; padding:16px; background:rgba(0,0,0,0.2); border-radius:10px;">
+    <div style="font-size:12px; color:#94a3b8; margin-bottom:8px;">对已勾选的歌曲：</div>
+    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+      <input type="text" id="batchTagInput" placeholder="标签名"
+             style="flex:1; min-width:120px; padding:8px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.15);
+                    background:rgba(0,0,0,0.3); color:#fff; font-size:13px;">
+      <button id="batchAddTagBtn" style="padding:8px 14px; border-radius:8px; border:none;
+              background:#ef4444; color:#fff; font-size:13px; cursor:pointer;">添加</button>
+      <button id="batchRemoveTagBtn" style="padding:8px 14px; border-radius:8px; border:none;
+              background:rgba(255,255,255,0.15); color:#fff; font-size:13px; cursor:pointer;">移除</button>
+    </div>
+    <div id="batchTagStatus" style="font-size:12px; color:#94a3b8; margin-top:8px;"></div>
+  </div>
+</div>
+
 <audio id="audio" preload="metadata"></audio>
 
 <script>
@@ -531,6 +638,12 @@
    配置与状态
    ========================================================= */
 const CONFIG = { owner: 'FanyDay102', repo: 'soundsudio', branch: 'main' };
+
+/* ⚠️ 默认 PAT（留空 = 每次需在设置里手动输入，更安全）
+   若你的仓库页面无法被任何人访问，可填入 PAT 省去每次输入。
+   但只要能通过链接打开页面，任何人右键查看源码都能看到这里的 PAT。
+   强烈建议留空。 */
+const DEFAULT_PAT = '';
 
 let allSongs = [];
 let displaySongs = [];
@@ -545,6 +658,16 @@ let activeLyricIndex = -1;
 let globalTags = JSON.parse(localStorage.getItem('mp_tags_pool') || '[]');
 let songTagsMap = JSON.parse(localStorage.getItem('mp_song_tags') || '{}');
 let savedOrder = JSON.parse(localStorage.getItem('mp_song_order') || '[]');
+
+// 批量模式
+let batchMode = null;       // 'delete' | 'cache' | 'batchTag'
+let selectedPaths = new Set();
+
+// PAT（sessionStorage，关闭标签页即清除；如果 DEFAULT_PAT 有值优先用）
+let userPAT = DEFAULT_PAT || sessionStorage.getItem('gh_pat') || '';
+
+// IndexedDB
+let cacheDB = null;
 
 // DOM
 const mainContainer = document.getElementById('mainContainer');
@@ -597,6 +720,333 @@ let activeMenuPath = '';
 function getCoverUrl(seed) {
   return `https://picsum.photos/seed/${encodeURIComponent(seed)}/500/500`;
 }
+
+/* =========================================================
+   GitHub Token / 设置面板
+   ========================================================= */
+function getPAT() {
+  if (!userPAT) {
+    alert('请先在设置中填入 GitHub Token（上传/删除需要）');
+    openSettings();
+    return null;
+  }
+  return userPAT;
+}
+
+const settingsBtn = document.getElementById('settingsBtn');
+const settingsPanel = document.getElementById('settingsPanel');
+const settingsOverlay = document.getElementById('settingsOverlay');
+const closeSettingsBtn = document.getElementById('closeSettingsBtn');
+const patInput = document.getElementById('patInput');
+
+function openSettings() {
+  settingsPanel.style.display = 'block';
+  settingsOverlay.style.display = 'block';
+  patInput.value = userPAT;
+}
+function closeSettings() {
+  settingsPanel.style.display = 'none';
+  settingsOverlay.style.display = 'none';
+}
+settingsBtn.addEventListener('click', openSettings);
+closeSettingsBtn.addEventListener('click', closeSettings);
+settingsOverlay.addEventListener('click', closeSettings);
+patInput.addEventListener('input', () => {
+  userPAT = patInput.value.trim();
+  if (userPAT) sessionStorage.setItem('gh_pat', userPAT);
+  else sessionStorage.removeItem('gh_pat');
+});
+
+/* =========================================================
+   上传曲目（GitHub Contents API）
+   ========================================================= */
+function arrayBufferToBase64(buffer) {
+  const bytes = new Uint8Array(buffer);
+  let binary = '';
+  const chunk = 0x8000;
+  for (let i = 0; i < bytes.length; i += chunk) {
+    binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunk));
+  }
+  return btoa(binary);
+}
+
+async function uploadMp3Files(files) {
+  const token = getPAT();
+  if (!token) return;
+  const statusEl = document.getElementById('uploadStatus');
+  const results = [];
+
+  for (const file of files) {
+    if (!file.name.toLowerCase().endsWith('.mp3')) continue;
+    statusEl.textContent = `上传中：${file.name} …`;
+    try {
+      const buf = await file.arrayBuffer();
+      const base64 = arrayBufferToBase64(buf);
+      const path = file.name;
+
+      const res = await fetch(
+        `https://api.github.com/repos/${CONFIG.owner}/${CONFIG.repo}/contents/${encodeURIComponent(path)}`,
+        {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/vnd.github+json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            message: `upload: ${file.name}`,
+            content: base64,
+            branch: CONFIG.branch
+          })
+        }
+      );
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message || `HTTP ${res.status}`);
+      }
+      results.push(`✅ ${file.name}`);
+    } catch (e) {
+      results.push(`❌ ${file.name}：${e.message}`);
+    }
+  }
+  statusEl.innerHTML = results.join('<br>');
+  await fetchSongs();
+}
+
+document.getElementById('mp3FileInput').addEventListener('change', async (e) => {
+  const files = Array.from(e.target.files);
+  if (files.length) await uploadMp3Files(files);
+  e.target.value = '';
+});
+
+/* =========================================================
+   批量模式
+   ========================================================= */
+function enterBatchMode(mode) {
+  batchMode = mode;
+  selectedPaths.clear();
+  document.getElementById('batchToolbar').style.display = 'block';
+  document.getElementById('batchTagPanel').style.display = mode === 'batchTag' ? 'block' : 'none';
+
+  const execBtn = document.getElementById('executeBatchBtn');
+  execBtn.style.display = mode === 'batchTag' ? 'none' : 'inline-block';
+  execBtn.textContent = mode === 'delete' ? '🗑️ 删除选中' : '💾 缓存选中';
+  document.getElementById('batchStatus').textContent = '';
+  document.getElementById('batchTagStatus').textContent = '';
+  updateBatchCount();
+  renderPlaylist();
+}
+
+function exitBatchMode() {
+  batchMode = null;
+  selectedPaths.clear();
+  document.getElementById('batchToolbar').style.display = 'none';
+  document.getElementById('batchTagPanel').style.display = 'none';
+  renderPlaylist();
+}
+
+function updateBatchCount() {
+  document.getElementById('batchCount').textContent = `已选 ${selectedPaths.size} 首`;
+}
+
+/* =========================================================
+   删除曲目
+   ========================================================= */
+async function executeDelete() {
+  const token = getPAT();
+  if (!token) return;
+  if (selectedPaths.size === 0) {
+    document.getElementById('batchStatus').textContent = '请先勾选歌曲';
+    return;
+  }
+
+  const statusEl = document.getElementById('batchStatus');
+  const paths = Array.from(selectedPaths);
+  let ok = 0, fail = 0;
+
+  for (const path of paths) {
+    statusEl.textContent = `删除中：${path} …`;
+    try {
+      const getRes = await fetch(
+        `https://api.github.com/repos/${CONFIG.owner}/${CONFIG.repo}/contents/${encodeURIComponent(path)}?ref=${CONFIG.branch}`,
+        { headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/vnd.github+json' } }
+      );
+      if (!getRes.ok) throw new Error(`获取 SHA 失败 (${getRes.status})`);
+      const meta = await getRes.json();
+
+      const delRes = await fetch(
+        `https://api.github.com/repos/${CONFIG.owner}/${CONFIG.repo}/contents/${encodeURIComponent(path)}`,
+        {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/vnd.github+json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            message: `delete: ${path}`,
+            sha: meta.sha,
+            branch: CONFIG.branch
+          })
+        }
+      );
+
+      if (!delRes.ok) {
+        const err = await delRes.json().catch(() => ({}));
+        throw new Error(err.message || `HTTP ${delRes.status}`);
+      }
+      ok++;
+
+      delete songTagsMap[path];
+      localStorage.setItem('mp_song_tags', JSON.stringify(songTagsMap));
+    } catch (e) {
+      fail++;
+      console.error('删除失败', path, e);
+    }
+  }
+
+  statusEl.textContent = `完成：成功 ${ok}，失败 ${fail}`;
+  localStorage.removeItem('mp_song_order');
+  await fetchSongs();
+  exitBatchMode();
+}
+
+/* =========================================================
+   IndexedDB 缓存
+   ========================================================= */
+function openCacheDB() {
+  if (cacheDB) return Promise.resolve(cacheDB);
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open('mp_cache_db', 1);
+    req.onupgradeneeded = () => {
+      const db = req.result;
+      if (!db.objectStoreNames.contains('tracks')) {
+        db.createObjectStore('tracks', { keyPath: 'path' });
+      }
+    };
+    req.onsuccess = () => { cacheDB = req.result; resolve(cacheDB); };
+    req.onerror = () => reject(req.error);
+  });
+}
+
+async function getCachedBlobUrl(path) {
+  try {
+    await openCacheDB();
+    return await new Promise((resolve) => {
+      const tx = cacheDB.transaction('tracks', 'readonly');
+      const req = tx.objectStore('tracks').get(path);
+      req.onsuccess = () => {
+        const rec = req.result;
+        resolve(rec && rec.blob ? URL.createObjectURL(rec.blob) : null);
+      };
+      req.onerror = () => resolve(null);
+    });
+  } catch (e) {
+    console.warn('读取缓存失败', e);
+    return null;
+  }
+}
+
+async function cacheSongs(paths) {
+  await openCacheDB();
+  const statusEl = document.getElementById('batchStatus');
+  const songs = allSongs.filter(s => paths.includes(s.path));
+  let ok = 0, fail = 0;
+
+  for (const song of songs) {
+    statusEl.textContent = `缓存中：${song.name} …`;
+    try {
+      const res = await fetch(song.url);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const blob = await res.blob();
+
+      const tx = cacheDB.transaction('tracks', 'readwrite');
+      tx.objectStore('tracks').put({
+        path: song.path,
+        name: song.name,
+        blob: blob,
+        type: blob.type,
+        size: blob.size,
+        cachedAt: Date.now()
+      });
+      await new Promise((r2, j2) => { tx.oncomplete = r2; tx.onerror = () => j2(tx.error); });
+      ok++;
+    } catch (e) {
+      fail++;
+      console.error('缓存失败', song, e);
+    }
+  }
+
+  statusEl.textContent = `缓存完成：成功 ${ok}，失败 ${fail}`;
+  updateBatchCount();
+}
+
+/* =========================================================
+   批量标签
+   ========================================================= */
+function batchApplyTag(tag, add) {
+  if (!tag) {
+    document.getElementById('batchTagStatus').textContent = '请填写标签';
+    return;
+  }
+  if (selectedPaths.size === 0) {
+    document.getElementById('batchTagStatus').textContent = '请先勾选歌曲';
+    return;
+  }
+
+  if (add && !globalTags.includes(tag)) {
+    globalTags.push(tag);
+    localStorage.setItem('mp_tags_pool', JSON.stringify(globalTags));
+  }
+
+  selectedPaths.forEach(path => {
+    if (!songTagsMap[path]) songTagsMap[path] = [];
+    if (add) {
+      if (!songTagsMap[path].includes(tag)) songTagsMap[path].push(tag);
+    } else {
+      songTagsMap[path] = songTagsMap[path].filter(t => t !== tag);
+    }
+  });
+
+  localStorage.setItem('mp_song_tags', JSON.stringify(songTagsMap));
+  updateTagSelect();
+  renderPlaylist();
+  document.getElementById('batchTagStatus').textContent =
+    add ? `已为 ${selectedPaths.size} 首歌添加标签「${tag}」` : `已移除标签「${tag}」`;
+}
+
+document.getElementById('batchAddTagBtn').addEventListener('click', () => {
+  batchApplyTag(document.getElementById('batchTagInput').value.trim(), true);
+});
+document.getElementById('batchRemoveTagBtn').addEventListener('click', () => {
+  batchApplyTag(document.getElementById('batchTagInput').value.trim(), false);
+});
+
+/* =========================================================
+   设置面板动作绑定
+   ========================================================= */
+document.querySelectorAll('.settings-action').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const action = btn.dataset.action;
+    document.getElementById('uploadPanel').style.display = 'none';
+    document.getElementById('batchToolbar').style.display = 'none';
+    document.getElementById('batchTagPanel').style.display = 'none';
+
+    if (action === 'upload') {
+      document.getElementById('uploadPanel').style.display = 'block';
+    } else {
+      closeSettings();
+      enterBatchMode(action);
+      mainContainer.classList.add('show-list');
+    }
+  });
+});
+
+document.getElementById('executeBatchBtn').addEventListener('click', () => {
+  if (batchMode === 'delete') executeDelete();
+  else if (batchMode === 'cache') cacheSongs(Array.from(selectedPaths));
+});
 
 /* =========================================================
    核心：获取歌词
@@ -782,10 +1232,10 @@ closeFloatBtn.addEventListener('click', () => {
   floatLyricBtn.classList.remove('active');
 });
 
-let isDragging = false, startX, startY, initialLeft, initialTop;
+let isDraggingFloat = false, startX, startY, initialLeft, initialTop;
 inPageFloat.addEventListener('pointerdown', (e) => {
   if (e.target.closest('.float-close')) return;
-  isDragging = true;
+  isDraggingFloat = true;
   startX = e.clientX; startY = e.clientY;
   const rect = inPageFloat.getBoundingClientRect();
   initialLeft = rect.left; initialTop = rect.top;
@@ -793,12 +1243,12 @@ inPageFloat.addEventListener('pointerdown', (e) => {
   inPageFloat.setPointerCapture(e.pointerId);
 });
 inPageFloat.addEventListener('pointermove', (e) => {
-  if (!isDragging) return;
+  if (!isDraggingFloat) return;
   inPageFloat.style.left = `${initialLeft + (e.clientX - startX)}px`;
   inPageFloat.style.top = `${initialTop + (e.clientY - startY)}px`;
 });
 inPageFloat.addEventListener('pointerup', (e) => {
-  isDragging = false;
+  isDraggingFloat = false;
   inPageFloat.releasePointerCapture(e.pointerId);
 });
 
@@ -834,8 +1284,10 @@ async function fetchSongs() {
     updateTagSelect();
     renderPlaylist();
     
-    songTitle.textContent = '准备就绪';
-    songArtist.textContent = '点击列表开始播放';
+    if (!batchMode) {
+      songTitle.textContent = '准备就绪';
+      songArtist.textContent = '点击列表开始播放';
+    }
   } catch (error) {
     console.error(error);
     playlistEl.innerHTML = `<li style="padding:20px;text-align:center;color:#ef4444;">❌ 读取失败: ${error.message}</li>`;
@@ -893,9 +1345,18 @@ function renderPlaylist() {
     const tags = songTagsMap[song.path] || [];
     const tagHtml = tags.map(t => `<span class="mini-tag">${t}</span>`).join('');
     const cover = getCoverUrl(song.path);
+    const safePath = song.path.replace(/'/g, "\\'");
+    const attrPath = song.path.replace(/"/g, '&quot;');
+    const checked = selectedPaths.has(song.path) ? 'checked' : '';
+    const checkboxHtml = batchMode
+      ? `<input type="checkbox" class="batch-check" data-path="${attrPath}" ${checked}>`
+      : '';
+    const moreBtn = batchMode ? '' : `<button class="btn-more" onclick="openMenu(event, '${safePath}')">⋮</button>`;
+    const draggable = batchMode ? 'false' : 'true';
 
     return `
-      <li class="track-item ${isActive}" draggable="true" data-index="${index}" data-path="${song.path}">
+      <li class="track-item ${isActive} ${batchMode ? 'batch-mode' : ''}" draggable="${draggable}" data-index="${index}" data-path="${attrPath}">
+        ${checkboxHtml}
         <img class="track-icon" src="${cover}" loading="lazy" alt="cover">
         <div class="track-info">
           <div class="track-name">${song.name}</div>
@@ -903,14 +1364,14 @@ function renderPlaylist() {
           <div class="song-tags">${tagHtml}</div>
         </div>
         <div class="playing-indicator"><i></i><i></i><i></i></div>
-        <button class="btn-more" onclick="openMenu(event, '${song.path.replace(/'/g, "\\'")}')">⋮</button>
+        ${moreBtn}
       </li>
     `;
   }).join('');
 
   playlistEl.innerHTML = html;
 
-  bindDragEvents();
+  if (!batchMode) bindDragEvents();
   
   if (currentIndex >= 0 && currentIndex < displaySongs.length) {
     setTimeout(() => {
@@ -1022,10 +1483,10 @@ function saveNewOrder() {
 /* =========================================================
    播放逻辑
    ========================================================= */
-function loadSong(index, autoPlay = true) {
+async function loadSong(index, autoPlay = true) {
   if (index < 0 || index >= displaySongs.length) return;
   
-  if (currentIndex === index && audio.src === displaySongs[index].url) {
+  if (currentIndex === index && audio.src) {
     if (isPlaying) audio.pause();
     else audio.play();
     return;
@@ -1045,7 +1506,16 @@ function loadSong(index, autoPlay = true) {
   document.querySelectorAll('.track-item').forEach(el => el.classList.remove('active'));
   document.querySelectorAll(`.track-item[data-index="${index}"]`).forEach(el => el.classList.add('active'));
 
-  audio.src = song.url;
+  // 释放上一次 blob URL
+  const oldSrc = audio.src;
+  if (oldSrc && oldSrc.startsWith('blob:')) {
+    URL.revokeObjectURL(oldSrc);
+  }
+
+  // 优先尝试本地缓存
+  const cachedUrl = await getCachedBlobUrl(song.path);
+  audio.src = cachedUrl || song.url;
+
   fetchLyrics(song.name);
 
   if ('mediaSession' in navigator) {
@@ -1128,14 +1598,38 @@ function handleNextPrev(direction) {
    ========================================================= */
 playlistEl.addEventListener('click', (e) => {
   if (e.target.closest('.btn-more')) return;
+  if (e.target.closest('.batch-check')) return;
+
   const li = e.target.closest('.track-item');
   if (!li) return;
+
+  if (batchMode) {
+    const path = li.dataset.path;
+    const cb = li.querySelector('.batch-check');
+    if (cb) {
+      cb.checked = !cb.checked;
+      if (cb.checked) selectedPaths.add(path);
+      else selectedPaths.delete(path);
+      updateBatchCount();
+    }
+    return;
+  }
+
   const index = parseInt(li.dataset.index);
   loadSong(index);
   
-  // 移动端选中歌曲后自动返回播放页
   if (window.innerWidth <= 768) {
     mainContainer.classList.remove('show-list');
+  }
+});
+
+// 复选框变化
+playlistEl.addEventListener('change', (e) => {
+  if (e.target.classList && e.target.classList.contains('batch-check')) {
+    const path = e.target.dataset.path;
+    if (e.target.checked) selectedPaths.add(path);
+    else selectedPaths.delete(path);
+    updateBatchCount();
   }
 });
 
