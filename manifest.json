@@ -12,22 +12,16 @@
   "theme_color": "#ef4444",
   "icons": [
     {
-      "src": "icons/icon-192x192.png",
+      "src": "https://fanyday102.github.io/soundsudio/36.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "icons/icon-512x512.png",
+      "src": "https://fanyday102.github.io/soundsudio/36.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
-    },
-    {
-      "src": "icons/icon-maskable-512x512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
     }
   ],
   "screenshots": [
