@@ -3,7 +3,20 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-<title>沉浸式音乐播放器</title>
+<title>FanyDaySoundStudio</title>
+
+<!-- ===== PWA 配置 ===== -->
+<link rel="manifest" href="./manifest.json" />
+<link rel="icon" href="./icons/favicon.ico" sizes="any" />
+<link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192x192.png" />
+<link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
+<meta name="theme-color" content="#ef4444" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="FD.Sounds" />
+<meta name="application-name" content="FD.Sounds" />
+
 <style>
   :root {
     --primary: #ef4444;
@@ -744,8 +757,8 @@ let selectedPaths = new Set();
 
 // ===== 目录相关 =====
 let cacheDirHandle = null;
-let dirPermission = 'no-handle'; // 'no-handle' | 'granted' | 'prompt' | 'denied'
-let dirFileMap = new Map();      // filename.toLowerCase() -> { file, blobUrl, name }
+let dirPermission = 'no-handle';
+let dirFileMap = new Map();
 
 // DOM
 const mainContainer = document.getElementById('mainContainer');
@@ -801,6 +814,17 @@ function escapeHtml(s) {
 }
 function getCoverUrl(seed) {
   return `https://picsum.photos/seed/${encodeURIComponent(seed)}/500/500`;
+}
+
+/* =========================================================
+   Service Worker 注册（为 PWA 可安装 / PWA Builder 打包用）
+   ========================================================= */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(reg => console.log('[SW] 注册成功', reg.scope))
+      .catch(err => console.warn('[SW] 注册失败（不影响使用）', err));
+  });
 }
 
 /* =========================================================
@@ -865,8 +889,6 @@ async function fsGetHandle() {
 /* =========================================================
    目录管理
    ========================================================= */
-
-// 首次授权后弹一次引导提示（localStorage 控制）
 function showPersistentHintOnce() {
   try {
     if (localStorage.getItem('mp_persistent_hint_shown') === '1') return;
@@ -950,7 +972,6 @@ function updateDirBanner() {
     return;
   }
 
-  // granted
   dirBanner.style.display = 'none';
 }
 
@@ -968,7 +989,6 @@ async function initDirectory() {
 
     let perm;
     try {
-      // 关键改动：查询 readwrite 权限，而非 read
       perm = await handle.queryPermission({ mode: 'readwrite' });
     } catch (e) {
       perm = 'denied';
@@ -992,7 +1012,6 @@ async function restoreDirPermission() {
     return;
   }
   try {
-    // 关键改动：请求 readwrite 权限，触发三向提示
     const perm = await cacheDirHandle.requestPermission({ mode: 'readwrite' });
     if (perm === 'granted') {
       dirPermission = 'granted';
@@ -1084,7 +1103,6 @@ async function pickCacheDir() {
   try {
     const handle = await window.showDirectoryPicker({ mode: 'readwrite' });
 
-    // ★ 关键改动：立即请求 readwrite 权限，触发三向提示
     let perm;
     try {
       perm = await handle.requestPermission({ mode: 'readwrite' });
@@ -1096,7 +1114,6 @@ async function pickCacheDir() {
       return;
     }
 
-    // 清理旧目录资源
     for (const entry of dirFileMap.values()) {
       if (entry.blobUrl) URL.revokeObjectURL(entry.blobUrl);
     }
@@ -1115,7 +1132,6 @@ async function pickCacheDir() {
 
     await scanCacheDir();
 
-    // 首次授权后弹一次引导提示
     showPersistentHintOnce();
   } catch (e) {
     if (e.name === 'AbortError') return;
@@ -1723,7 +1739,7 @@ function loadSong(index, autoPlay = true) {
   songArtist.textContent = song.isLocal
     ? ('本地文件 · ' + (song.file ? song.file.name : song.name))
     : (song.offlineReady ? song.path + '  ·  已缓存' : song.path);
-  document.title = `${song.name} - 音乐播放器`;
+  document.title = `${song.name} - FanyDaySoundStudio`;
 
   const coverUrl = getCoverUrl(song.path);
   mainCover.src = coverUrl;
@@ -2079,7 +2095,6 @@ async function doCacheSelected() {
     return;
   }
 
-  // 请求 readwrite 权限（关键：三向提示）
   try {
     let perm = await cacheDirHandle.queryPermission({ mode: 'readwrite' });
     if (perm !== 'granted') {
@@ -2089,7 +2104,6 @@ async function doCacheSelected() {
       alert('未获得目录写入权限，无法缓存。\n请在权限弹窗中选择「每次访问时都允许」。');
       return;
     }
-    // 同步状态
     dirPermission = 'granted';
     updateCacheDirUI();
     updateDirBanner();
