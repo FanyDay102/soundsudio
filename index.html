@@ -3,9 +3,6 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-<!-- 👇 新增的代码：PWA 应用清单 👇 -->
-<link rel="manifest" href="manifest.json">
-<!-- 👆 新增的代码 👆 -->
 <title>沉浸式音乐播放器</title>
 <style>
   :root {
@@ -36,7 +33,6 @@
     transform: scale(1.2); transition: background-image 0.5s;
   }
 
-  /* ================= 播放页 ================= */
   .player-page {
     flex: 1; min-width: 0; display: flex; flex-direction: column;
     padding: 24px 40px; position: relative; z-index: 10; height: 100%;
@@ -161,7 +157,6 @@
   .btn-play-main svg { width: 32px; height: 32px; fill: currentColor; }
   .hide { display: none !important; }
 
-  /* ================= 列表页 ================= */
   .list-page {
     flex: 0 0 400px; min-width: 400px;
     background: var(--glass-bg);
@@ -176,7 +171,6 @@
   .header-top h2 { font-size: 18px; font-weight: 600; }
   .header-top span { font-size: 13px; color: var(--text-sub); font-weight: 400; }
 
-  /* 目录状态横幅 */
   .dir-banner {
     display: none; align-items: center; justify-content: space-between;
     gap: 10px; padding: 10px 16px;
@@ -267,7 +261,6 @@
   .btn-more { background: none; border: none; font-size: 20px; color: var(--text-sub); cursor: pointer; padding: 0 6px; line-height: 1; transition: 0.2s; }
   .btn-more:hover { color: #fff; }
 
-  /* 悬浮菜单 */
   .context-menu {
     position: fixed; background: #1e293b;
     border: 1px solid rgba(255,255,255,0.1);
@@ -282,7 +275,6 @@
   .menu-tag-label:hover { background: rgba(255,255,255,0.1); }
   .menu-tag-label input { accent-color: var(--primary); }
 
-  /* 悬浮歌词 */
   .floating-lyrics {
     position: fixed; top: 20%; left: 20%;
     background: rgba(15, 23, 42, 0.85); color: #fff;
@@ -302,7 +294,6 @@
   .float-close:hover { color: #fff; }
   .float-text { pointer-events: none; padding: 10px; text-shadow: 0 2px 5px rgba(0,0,0,0.8); }
 
-  /* 齿轮按钮 */
   .gear-btn {
     margin-left: auto;
     width: 34px; height: 34px;
@@ -327,7 +318,6 @@
   .list-page.selection-mode .tag-manager { display: none; }
   .list-page.selection-mode .btn-more { display: none; }
 
-  /* 设置面板 */
   .settings-panel {
     position: absolute; inset: 0; z-index: 30;
     display: flex; flex-direction: column;
@@ -382,7 +372,6 @@
   .setting-item .si-desc { font-size: 11.5px; color: var(--text-sub); line-height: 1.45; word-break: break-all; }
   .setting-item .si-arrow { color: var(--text-sub); font-size: 18px; flex-shrink: 0; }
 
-  /* 批量选择 */
   .track-item.selectable { gap: 10px; }
   .track-check {
     width: 20px; height: 20px; border-radius: 50%; flex-shrink: 0;
@@ -427,7 +416,6 @@
   .batch-select:focus { border-color: var(--primary); }
   .batch-select option { background: #1e293b; color: #fff; }
 
-  /* 工具菜单 */
   .tool-menu {
     position: fixed; background: #1e293b;
     border: 1px solid rgba(255,255,255,0.1);
@@ -445,7 +433,6 @@
   .tool-menu-item:hover { background: rgba(255,255,255,0.1); }
   .tool-menu-divider { height: 1px; background: rgba(255,255,255,0.08); margin: 4px 6px; }
 
-  /* 移动端 */
   @media (max-width: 768px) {
     body { padding: 0; align-items: flex-start; }
     .main-container { flex-direction: column; height: 100dvh; overflow: hidden; }
@@ -506,7 +493,6 @@
 <div class="main-container" id="mainContainer">
   <div class="bg-blur" id="bgBlur"></div>
 
-  <!-- 播放页 -->
   <section class="player-page">
     <div class="player-nav">
       <div class="nav-icon" id="mobileListBtn" title="播放列表" role="button">
@@ -566,7 +552,6 @@
     </div>
   </section>
 
-  <!-- 列表页 -->
   <section class="list-page">
     <div class="list-header">
       <div class="header-top">
@@ -596,7 +581,6 @@
       </div>
     </div>
 
-    <!-- 目录状态横幅 -->
     <div class="dir-banner" id="dirBanner"></div>
 
     <ul class="playlist" id="playlist">
@@ -607,7 +591,6 @@
       <div class="batch-actions" id="batchActions"></div>
     </div>
 
-    <!-- 设置面板 -->
     <div class="settings-panel" id="settingsPanel">
       <div class="settings-header">
         <h3>设置</h3>
@@ -708,7 +691,6 @@
   </section>
 </div>
 
-<!-- 悬浮菜单 -->
 <div class="context-menu" id="contextMenu">
   <div class="menu-item" id="downloadBtn">⬇️ 下载歌曲</div>
   <div class="menu-divider"></div>
@@ -716,7 +698,6 @@
   <div class="menu-tags" id="menuTags"></div>
 </div>
 
-<!-- 悬浮歌词 -->
 <div class="floating-lyrics" id="inPageFloat">
   <span class="float-close" id="closeFloatBtn">✕</span>
   <div class="float-text" id="floatText">等待播放...</div>
@@ -744,8 +725,8 @@
    ========================================================= */
 const CONFIG = { owner: 'FanyDay102', repo: 'soundsudio', branch: 'main' };
 
-let allSongs = [];        // 所有歌曲（远程 + 手动本地 + 目录独有）
-let displaySongs = [];    // 当前显示的（经筛选）
+let allSongs = [];
+let displaySongs = [];
 let currentIndex = -1;
 let isPlaying = false;
 let repeatMode = 'all';
@@ -884,6 +865,23 @@ async function fsGetHandle() {
 /* =========================================================
    目录管理
    ========================================================= */
+
+// 首次授权后弹一次引导提示（localStorage 控制）
+function showPersistentHintOnce() {
+  try {
+    if (localStorage.getItem('mp_persistent_hint_shown') === '1') return;
+    localStorage.setItem('mp_persistent_hint_shown', '1');
+    setTimeout(() => {
+      alert(
+        '💡 小提示\n\n' +
+        '如果浏览器再询问目录权限，请选择「每次访问时都允许」。\n' +
+        '这样以后打开网页或离线使用都无需再手动点授权。\n\n' +
+        '（需要 Chrome 122+ 或 Edge 最新版）'
+      );
+    }, 400);
+  } catch (e) {}
+}
+
 function updateCacheDirUI() {
   const title = document.getElementById('cacheDirTitle');
   const desc = document.getElementById('cacheDirDesc');
@@ -893,8 +891,8 @@ function updateCacheDirUI() {
 
   if (cacheDirHandle) {
     title.textContent = '缓存目录：' + cacheDirHandle.name;
-    const state = dirPermission === 'granted' ? '✅ 已授权'
-      : dirPermission === 'prompt' ? '⚠️ 需重新授权'
+    const state = dirPermission === 'granted' ? '✅ 已授权（下次打开无需再点）'
+      : dirPermission === 'prompt' ? '⚠️ 需重新授权（点击"恢复授权"）'
       : dirPermission === 'denied' ? '❌ 权限被拒绝'
       : '';
     desc.textContent = state;
@@ -931,8 +929,8 @@ function updateDirBanner() {
   if (dirPermission === 'prompt') {
     dirBanner.className = 'dir-banner warning';
     dirBanner.innerHTML = `
-      <span>🔒 需要重新授权目录访问才能读取缓存歌曲</span>
-      <button id="bannerRestoreBtn">点击恢复</button>
+      <span>🔒 需重新授权目录访问<br><span style="opacity:0.75;font-size:11px;">点击后在弹窗中选「每次访问时都允许」</span></span>
+      <button id="bannerRestoreBtn">恢复授权</button>
     `;
     dirBanner.style.display = 'flex';
     const b = document.getElementById('bannerRestoreBtn');
@@ -962,6 +960,7 @@ async function initDirectory() {
     if (!handle) {
       dirPermission = 'no-handle';
       updateCacheDirUI();
+      updateDirBanner();
       return;
     }
     cacheDirHandle = handle;
@@ -969,7 +968,8 @@ async function initDirectory() {
 
     let perm;
     try {
-      perm = await handle.queryPermission({ mode: 'read' });
+      // 关键改动：查询 readwrite 权限，而非 read
+      perm = await handle.queryPermission({ mode: 'readwrite' });
     } catch (e) {
       perm = 'denied';
     }
@@ -983,6 +983,7 @@ async function initDirectory() {
     dirPermission = 'denied';
   }
   updateCacheDirUI();
+  updateDirBanner();
 }
 
 async function restoreDirPermission() {
@@ -991,7 +992,8 @@ async function restoreDirPermission() {
     return;
   }
   try {
-    const perm = await cacheDirHandle.requestPermission({ mode: 'read' });
+    // 关键改动：请求 readwrite 权限，触发三向提示
+    const perm = await cacheDirHandle.requestPermission({ mode: 'readwrite' });
     if (perm === 'granted') {
       dirPermission = 'granted';
       updateCacheDirUI();
@@ -1001,7 +1003,7 @@ async function restoreDirPermission() {
       dirPermission = perm === 'denied' ? 'denied' : 'prompt';
       updateCacheDirUI();
       updateDirBanner();
-      alert('未获得目录访问权限，无法读取缓存歌曲');
+      alert('未获得目录访问权限，无法读取缓存歌曲。\n\n若想以后不再弹窗，请选择「每次访问时都允许」。');
     }
   } catch (e) {
     console.error(e);
@@ -1012,7 +1014,6 @@ async function restoreDirPermission() {
 async function scanCacheDir() {
   if (!cacheDirHandle || dirPermission !== 'granted') return;
 
-  // 清空旧的
   for (const entry of dirFileMap.values()) {
     if (entry.blobUrl) URL.revokeObjectURL(entry.blobUrl);
   }
@@ -1050,7 +1051,6 @@ async function scanCacheDir() {
   renderPlaylist();
 }
 
-// 把目录里的文件应用到对应的远程歌曲
 function applyDirFilesToSongs() {
   for (const song of allSongs) {
     if (song.isLocal) continue;
@@ -1070,7 +1070,6 @@ function applyDirFilesToSongs() {
   }
 }
 
-// 播放时用的 URL
 function getSongPlayUrl(song) {
   if (song.isLocal) return song.url;
   if (song._dirBlobUrl) return song._dirBlobUrl;
@@ -1085,7 +1084,19 @@ async function pickCacheDir() {
   try {
     const handle = await window.showDirectoryPicker({ mode: 'readwrite' });
 
-    // 清理旧目录的资源
+    // ★ 关键改动：立即请求 readwrite 权限，触发三向提示
+    let perm;
+    try {
+      perm = await handle.requestPermission({ mode: 'readwrite' });
+    } catch (e) {
+      perm = 'denied';
+    }
+    if (perm !== 'granted') {
+      alert('未获得目录读写权限，无法使用缓存功能。\n\n请重试，并在弹窗中选择「每次访问时都允许」。');
+      return;
+    }
+
+    // 清理旧目录资源
     for (const entry of dirFileMap.values()) {
       if (entry.blobUrl) URL.revokeObjectURL(entry.blobUrl);
     }
@@ -1103,6 +1114,9 @@ async function pickCacheDir() {
     updateDirBanner();
 
     await scanCacheDir();
+
+    // 首次授权后弹一次引导提示
+    showPersistentHintOnce();
   } catch (e) {
     if (e.name === 'AbortError') return;
     console.error('选择目录失败', e);
@@ -1429,16 +1443,13 @@ async function fetchSongs() {
     const localSongs = allSongs.filter(s => s.isLocal);
     allSongs = [...localSongs, ...remoteSongs];
 
-    // 重新应用目录文件
     applyDirFilesToSongs();
-
     applySavedOrder();
 
-    // 持久化远程列表（精简字段）
     try {
       localStorage.setItem('mp_remote_songs', JSON.stringify(
         remoteSongs.map(s => ({ name: s.name, path: s.path }))
-      );
+      ));
     } catch (e) {}
 
     if (currentIndex === -1) {
@@ -1527,10 +1538,9 @@ function renderPlaylist() {
     const tags = songTagsMap[song.path] || [];
     const tagHtml = tags.map(t => `<span class="mini-tag">${escapeHtml(t)}</span>`).join('');
 
-    // 缓存状态标记
     let cacheTag = '';
     if (song.isLocal) {
-      cacheTag = ''; // 本地文件不额外标
+      cacheTag = '';
     } else if (song.offlineReady) {
       cacheTag = '<span class="mini-tag offline-tag">已缓存</span>';
     } else if (offline) {
@@ -1544,7 +1554,6 @@ function renderPlaylist() {
     const selectedCls = isSelected ? 'selected' : '';
     const draggable = selectionMode ? 'false' : 'true';
 
-    // 离线且未缓存 → 半透明
     const uncachedOffline = offline && !song.isLocal && !song.offlineReady;
     const offlineCls = uncachedOffline ? 'uncached-offline' : '';
 
@@ -1690,13 +1699,12 @@ function loadSong(index, autoPlay = true) {
   if (index < 0 || index >= displaySongs.length) return;
   const song = displaySongs[index];
 
-  // 离线且未缓存拦截
   const offline = !navigator.onLine;
   if (offline && !song.isLocal && !song._dirBlobUrl) {
     if (dirPermission === 'no-handle') {
       alert('离线状态且未设置缓存目录，无法播放此歌曲。\n请先联网到设置中"设置缓存目录"。');
     } else if (dirPermission === 'prompt') {
-      const go = confirm('离线状态且未授权目录访问。\n是否现在授权？');
+      const go = confirm('离线状态且未授权目录访问。\n是否现在授权？（授权时请选「每次访问时都允许」）');
       if (go) restoreDirPermission();
     } else {
       alert('离线状态且此歌曲未缓存到目录，无法播放。');
@@ -1704,7 +1712,6 @@ function loadSong(index, autoPlay = true) {
     return;
   }
 
-  // 同一首，切换播放/暂停
   if (currentIndex === index && audio.src === getSongPlayUrl(song)) {
     if (isPlaying) audio.pause();
     else audio.play().catch(() => {});
@@ -1896,9 +1903,6 @@ audio.addEventListener('loadedmetadata', () => {
 
 audio.addEventListener('error', () => {
   console.warn('音频加载失败');
-  if (!navigator.onLine) {
-    // 静默提示，已在 loadSong 里拦过
-  }
 });
 
 progress.addEventListener('input', () => {
@@ -2075,16 +2079,20 @@ async function doCacheSelected() {
     return;
   }
 
-  // 请求写权限（必须在用户手势内尽早调用）
+  // 请求 readwrite 权限（关键：三向提示）
   try {
     let perm = await cacheDirHandle.queryPermission({ mode: 'readwrite' });
     if (perm !== 'granted') {
       perm = await cacheDirHandle.requestPermission({ mode: 'readwrite' });
     }
     if (perm !== 'granted') {
-      alert('未获得目录写入权限，无法缓存');
+      alert('未获得目录写入权限，无法缓存。\n请在权限弹窗中选择「每次访问时都允许」。');
       return;
     }
+    // 同步状态
+    dirPermission = 'granted';
+    updateCacheDirUI();
+    updateDirBanner();
   } catch (e) {
     alert('权限请求失败：' + (e.message || e.name));
     return;
@@ -2130,7 +2138,6 @@ async function doCacheSelected() {
 
   if (btn) { btn.disabled = false; btn.textContent = '⬇ 缓存选中'; }
 
-  // 重新扫描，让刚缓存的歌立即生效
   await scanCacheDir();
 
   alert(fail === 0
@@ -2218,7 +2225,6 @@ youtubeOption.addEventListener('click', (e) => {
 function onNetworkChange() {
   updateDirBanner();
   renderPlaylist();
-  // 离线时也尝试扫描一下目录（如果已授权），确保最新
   if (!navigator.onLine && dirPermission === 'granted' && cacheDirHandle) {
     scanCacheDir();
   }
@@ -2230,13 +2236,11 @@ window.addEventListener('offline', onNetworkChange);
    初始化
    ========================================================= */
 async function init() {
-  // 1. 从 localStorage 恢复远程歌曲列表（离线时立即有列表）
   restoreSongsFromStorage();
   updateTagSelect();
   renderPlaylist();
   updateDirBanner();
 
-  // 2. 并行：在线时拉远程列表 + 初始化目录
   const tasks = [];
   if (navigator.onLine) {
     tasks.push(fetchSongs());
@@ -2244,7 +2248,6 @@ async function init() {
   tasks.push(initDirectory());
   await Promise.all(tasks);
 
-  // 3. 应用目录文件 + 重新渲染
   applyDirFilesToSongs();
   renderPlaylist();
   updateDirBanner();
